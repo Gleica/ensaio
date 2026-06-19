@@ -1,0 +1,27 @@
+{
+  "name": "ensaio",
+  "version": "1.0.0",
+  "description": "> Um simulador de IA onde você ensaia aquela conversa que dá frio na barriga — pedir aumento, cobrar um cliente, dar uma notícia ruim, terminar um contrato — **conversando com a outra pessoa antes de ela existir de verdade**.",
+  "main": "playwright.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gleica/ensaio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Gleica/ensaio/issues"
+  },
+  "homepage": "https://github.com/Gleica/ensaio#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
+}
