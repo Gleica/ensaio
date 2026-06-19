@@ -14,7 +14,7 @@ let state = {
 document.querySelectorAll("#traits .chip").forEach(c => {
   c.onclick = () => c.classList.toggle("on");
 });
-[..."#tones", "#difficulties"].forEach(sel => {
+["#tones", "#difficulties"].forEach(sel => {
   document.querySelectorAll(sel + " .chip").forEach(c => {
     c.onclick = () => {
       document.querySelectorAll(sel + " .chip").forEach(x => x.classList.remove("on"));
@@ -212,6 +212,56 @@ function renderCoach(j){
 
 function escapeHtml(s){
   return (s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+/* ---------- relatório final ---------- */
+$("reportBtn").onclick = async () => {
+  if(state.demo){ alert("O relatório está disponível apenas em ensaios ao vivo."); return; }
+  const userTurns = state.history.filter(m => m.role === "user").length;
+  if(userTurns < 2){ alert("Troque pelo menos 2 falas antes de gerar o relatório."); return; }
+  $("reportContent").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted)">⏳ Analisando sua conversa…</div>`;
+  $("reportModal").classList.add("on");
+  const transcript = state.history
+    .map(m => (m.role === "user" ? "VOCÊ: " : "OUTRO: ") + (typeof m.content === "string" ? m.content : ""))
+    .join("\n");
+  try{
+    const raw = await callClaude(reportSystem(state), [{ role: "user", content: "Transcrição:\n" + transcript }], 750);
+    const j = parseJSON(raw);
+    if(j) renderReport(j);
+    else $("reportContent").innerHTML = `<p style="white-space:pre-wrap;font-size:14px">${escapeHtml(raw)}</p>`;
+  }catch(e){
+    $("reportContent").innerHTML = `<p style="color:var(--bad)">Erro ao gerar relatório: ${escapeHtml(e.message)}</p>`;
+  }
+};
+
+$("reportClose").onclick = () => $("reportModal").classList.remove("on");
+
+function renderReport(j){
+  const nota = Math.max(0, Math.min(10, parseFloat(j.nota) || 0));
+  const scoreColor = nota < 4 ? "var(--bad)" : nota < 7 ? "var(--warn)" : "var(--ok)";
+
+  const fortes = (j.pontos_fortes || []).map(p =>
+    `<div class="report-item"><span>✅</span>${escapeHtml(p)}</div>`
+  ).join("");
+
+  const erros = (j.erros_recorrentes || []).map(e =>
+    `<div class="report-item"><span>⚠️</span>${escapeHtml(e)}</div>`
+  ).join("");
+
+  $("reportContent").innerHTML = `
+    <h2 style="margin:0 0 18px;font-size:18px">📋 Relatório da sessão</h2>
+    <div class="report-score">
+      <div class="score-circle" style="color:${scoreColor};border-color:${scoreColor};background:${scoreColor}1a">
+        ${nota.toFixed(1)}
+      </div>
+      <div class="score-title">${escapeHtml(j.titulo || "")}</div>
+    </div>
+    ${fortes ? `<div class="report-section"><h4>Pontos fortes</h4>${fortes}</div>` : ""}
+    ${erros ? `<div class="report-section"><h4>O que melhorar</h4>${erros}</div>` : ""}
+    ${j.melhor_fala ? `<div class="report-section"><h4>⭐ Sua melhor fala</h4><div class="report-best">"${escapeHtml(j.melhor_fala)}"</div></div>` : ""}
+    ${j.proximo_passo ? `<div class="report-section"><h4>🎯 Próximo passo</h4><div class="report-next">${escapeHtml(j.proximo_passo)}</div></div>` : ""}
+    ${j.arco ? `<div class="report-section"><h4>📈 Arco emocional</h4><p class="report-arc">${escapeHtml(j.arco)}</p></div>` : ""}
+  `;
 }
 
 /* ---------- reset ---------- */

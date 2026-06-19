@@ -130,6 +130,19 @@
   /* Gráfico de humor */
   .mood-chart{margin-top:14px;padding:10px 12px 6px;background:var(--bg2);border:1px solid var(--line);border-radius:12px}
   .mood-chart-label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin:0 0 6px}
+
+  /* Relatório final */
+  .report-card{max-width:560px;width:100%;max-height:90vh;overflow-y:auto}
+  .report-score{display:flex;align-items:center;gap:18px;margin-bottom:20px}
+  .score-circle{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:800;flex-shrink:0;border:3px solid}
+  .score-title{font-size:16px;font-weight:700;line-height:1.35}
+  .report-section{margin-top:16px}
+  .report-section h4{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  .report-item{display:flex;gap:9px;align-items:flex-start;margin-bottom:7px;font-size:14px;line-height:1.4}
+  .report-item span{flex-shrink:0;margin-top:1px}
+  .report-best{background:rgba(91,108,255,.1);border:1px solid rgba(91,108,255,.22);border-radius:10px;padding:10px 13px;font-size:14px;font-style:italic;margin-top:6px}
+  .report-next{background:rgba(52,211,154,.07);border:1px solid rgba(52,211,154,.2);border-radius:10px;padding:10px 13px;font-size:14px;margin-top:6px}
+  .report-arc{font-size:13.5px;color:var(--muted);margin:6px 0 0;line-height:1.5}
 </style>
 </head>
 <body>
@@ -245,6 +258,7 @@
 
       <div class="tools">
         <button class="btn ghost" id="coachBtn">🎯 Como fui?</button>
+        <button class="btn ghost" id="reportBtn">📋 Relatório final</button>
         <button class="btn ghost" id="resetBtn">↺ Nova cena</button>
       </div>
 
@@ -272,6 +286,14 @@
       <button class="btn primary" id="keySave">Salvar</button>
     </div>
     <p class="hint">Pegue sua chave em <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a> → API Keys. Se o modelo der erro, confira o nome exato no seu console.</p>
+  </div>
+</div>
+
+<!-- ============ MODAL RELATÓRIO ============ -->
+<div class="modal" id="reportModal">
+  <div class="card report-card">
+    <span class="x" id="reportClose">✕</span>
+    <div id="reportContent"></div>
   </div>
 </div>
 
