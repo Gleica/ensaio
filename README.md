@@ -81,6 +81,19 @@ A aplicação publicada funciona sem nenhuma configuração — basta acessar o 
 6. Use **🎯 Como fui?** para feedback imediato a qualquer momento ou **📋 Relatório final** ao encerrar a sessão.
 7. Clique em **↺ Nova cena** (canto superior direito do chat) para recomeçar com outra situação.
 
+## Moderação de conteúdo
+
+O EnsaIA inclui guardrails de segurança embutidos nos prompts enviados à API. Antes de qualquer instrução de roleplay, o modelo é instruído a recusar cenários que envolvam:
+
+- Discurso de ódio ou discriminação
+- Incitação à violência
+- Atividades ilegais
+- Desinformação
+- Violação de privacidade
+- Uso malicioso de tecnologia
+
+Se um desses conteúdos for detectado, o modelo responde com uma mensagem de recusa no próprio chat, sem expor erros técnicos ao usuário.
+
 ## Privacidade
 
 No **modo BYOK** (traga sua própria chave), a chave fica apenas no `sessionStorage` do seu navegador (apagada ao fechar a aba) e vai direto do seu navegador para a Anthropic — nenhum servidor intermediário.
