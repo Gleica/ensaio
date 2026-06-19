@@ -7,18 +7,20 @@ const $ = id => document.getElementById(id);
 
 let state = {
   who: "", rel: "", traits: [], goal: "", tone: "firme",
-  mood: 50, history: [], moodHistory: [], demo: false, demoStep: 0
+  mood: 50, history: [], moodHistory: [], difficulty: "normal", demo: false, demoStep: 0
 };
 
 /* ---------- chips ---------- */
 document.querySelectorAll("#traits .chip").forEach(c => {
   c.onclick = () => c.classList.toggle("on");
 });
-document.querySelectorAll("#tones .chip").forEach(c => {
-  c.onclick = () => {
-    document.querySelectorAll("#tones .chip").forEach(x => x.classList.remove("on"));
-    c.classList.add("on");
-  };
+[..."#tones", "#difficulties"].forEach(sel => {
+  document.querySelectorAll(sel + " .chip").forEach(c => {
+    c.onclick = () => {
+      document.querySelectorAll(sel + " .chip").forEach(x => x.classList.remove("on"));
+      c.classList.add("on");
+    };
+  });
 });
 
 /* ---------- chave / modal ---------- */
@@ -40,7 +42,8 @@ function readSetup(){
   state.rel    = $("rel").value;
   state.traits = [...document.querySelectorAll("#traits .chip.on")].map(c => c.dataset.v);
   state.goal   = $("goal").value.trim();
-  state.tone   = (document.querySelector("#tones .chip.on") || { dataset: { v: "firme" } }).dataset.v;
+  state.tone       = (document.querySelector("#tones .chip.on")       || { dataset: { v: "firme"  } }).dataset.v;
+  state.difficulty = (document.querySelector("#difficulties .chip.on") || { dataset: { v: "normal" } }).dataset.v;
 }
 
 /* ---------- render ---------- */
@@ -92,6 +95,11 @@ function openSim(){
   $("simWho").textContent = state.who;
   $("simRel").textContent = state.rel;
   $("demoTag").classList.toggle("hide", !state.demo);
+  const diffLabels = { facil: "😌 Fácil", normal: "😐 Normal", pesadelo: "🔥 Pesadelo" };
+  const diffColors = { facil: "var(--ok)", normal: "var(--muted)", pesadelo: "var(--bad)" };
+  $("diffTag").textContent = diffLabels[state.difficulty] || "";
+  $("diffTag").style.color = diffColors[state.difficulty] || "";
+  $("diffTag").classList.toggle("hide", state.demo);
   $("chat").innerHTML = "";
   $("coachBox").innerHTML = "";
   $("moodChart").innerHTML = "";

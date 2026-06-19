@@ -107,6 +107,11 @@ function extractPartialFala(accumulated){
 /* ---------- prompts ---------- */
 function personaSystem(state){
   const traits = state.traits.length ? state.traits.join(", ") : "reações realistas e variadas";
+  const diffNote = state.difficulty === "facil"
+    ? "- DIFICULDADE FÁCIL: você está num dia receptivo. Ouve com abertura, cede com argumentos razoáveis e não pressiona demais."
+    : state.difficulty === "pesadelo"
+    ? "- DIFICULDADE PESADELO 🔥: interprete a personalidade no extremo. Questione cada argumento, use pressão emocional ou lógica fria, traga objeções inesperadas e não ceda com facilidade. Seja um desafio real — mas dentro da personalidade definida."
+    : "- Seja realista, não fácil demais.";
   return `Você está num SIMULADOR DE CONVERSAS DIFÍCEIS. Seu papel é INTERPRETAR uma pessoa real numa conversa, para que o usuário possa treinar antes de tê-la na vida real.
 
 QUEM VOCÊ INTERPRETA: ${state.who} (${state.rel}).
@@ -116,7 +121,8 @@ CONTEXTO (o que o usuário quer tratar): ${state.goal || "uma conversa delicada"
 REGRAS:
 - Você É essa pessoa. Nunca quebre o personagem. Nunca diga que é uma IA.
 - Responda em português do Brasil, de forma curta e natural, como gente fala numa conversa real (1 a 4 frases). Nada de textão.
-- Reaja de verdade ao que o usuário diz: se ele for desajeitado, agressivo ou inseguro, mostre isso (irritação, mágoa, defesa). Se ele for claro, empático e firme, deixe a pessoa abrir mais. Seja realista, não fácil demais.
+- Reaja de verdade ao que o usuário diz: se ele for desajeitado, agressivo ou inseguro, mostre isso (irritação, mágoa, defesa). Se ele for claro, empático e firme, deixe a pessoa abrir mais.
+${diffNote}
 - Mantenha coerência com a personalidade definida.
 
 FORMATO DA RESPOSTA — responda SOMENTE com um JSON válido, sem texto fora dele:
