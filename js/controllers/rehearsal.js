@@ -14,6 +14,12 @@ import { updateMsgCounter } from "../ui/msgCounter.js";
 
 const $ = id => document.getElementById(id);
 
+// Infere pronome pelo artigo definido que precede o nome/descrição em PT-BR.
+// "a Ana", "minha chefe" → "ela" | "o Pedro", "meu gestor", nome sem artigo → "ele"
+function inferPronoun(who) {
+  return /^(a |minha )/i.test(who.trim()) ? "ela" : "ele";
+}
+
 export async function startRehearsal(state) {
   readSetup(state);
   if (!getKey() && !isSharedMode()) {
@@ -29,7 +35,7 @@ export async function startRehearsal(state) {
   showSim(state);
   setMood(state, 50);
   updateMsgCounter(state);
-  addBubble("Tudo pronto. Mande sua primeira fala para " + state.who + " — eu reajo como ela reagiria.", "them");
+  addBubble("Tudo pronto. Mande sua primeira fala para " + state.who + " — eu reajo como " + inferPronoun(state.who) + " reagiria.", "them");
 }
 
 export async function suggestOpening(state) {
