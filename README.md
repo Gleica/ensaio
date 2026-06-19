@@ -84,9 +84,9 @@ Acesse [console.anthropic.com](https://console.anthropic.com/) → **API Keys** 
 
 ## Privacidade
 
-No **modo BYOK**, a chave fica apenas no `sessionStorage` do seu navegador (apagada ao fechar a aba) e vai direto do navegador para a Anthropic — nenhum servidor intermediário.
+No **modo BYOK** (traga sua própria chave), a chave fica apenas no `sessionStorage` do seu navegador (apagada ao fechar a aba) e vai direto do seu navegador para a Anthropic — nenhum servidor intermediário.
 
-No **modo compartilhado** (evento), a chave é injetada pelo GitHub Actions no momento do deploy e nunca aparece no código-fonte do repositório.
+No **modo compartilhado** (acesso direto no link público), as chamadas à API passam por um proxy Cloudflare Worker. A chave da Anthropic vive exclusivamente como secret do Worker — nunca aparece no código-fonte do repositório, nunca é enviada ao navegador. O proxy aplica rate limiting por IP (via Cloudflare KV) e valida a origem das requisições.
 
 ## Possíveis melhorias futuras
 
