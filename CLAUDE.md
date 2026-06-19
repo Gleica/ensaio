@@ -15,9 +15,17 @@ python3 -m http.server 9000
 
 No build step, no dependencies, no package manager. Opening `index.html` directly in a browser also works, though a local server avoids potential CORS issues.
 
-## Architecture
+## File structure
 
-Everything lives in `index.html` — HTML structure, CSS (custom properties in `:root`), and JavaScript are all in one file. There is no bundler, no framework, no backend.
+```
+index.html      ← HTML structure + CSS (no inline JS)
+js/claude.js    ← API layer: callClaude, callClaudeStream, prompts, parsers
+js/app.js       ← state, UI, setup form, simulator, demo mode
+```
+
+`index.html` loads `js/claude.js` then `js/app.js` as plain `<script src>` tags. No bundler, no framework, no backend.
+
+## Architecture
 
 **Key design decisions:**
 
