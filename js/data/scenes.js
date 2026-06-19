@@ -1,9 +1,4 @@
-/* ============================================================
-   scenes.js — biblioteca de cenas prontas para ensaio
-   Cada cena preenche o formulário de setup automaticamente.
-   ============================================================ */
-
-const SCENES = [
+export const SCENES = [
   {
     id: "aumento",
     emoji: "💰",
@@ -13,7 +8,7 @@ const SCENES = [
     rel: "Gestor(a) / liderança",
     traits: ["defensiva", "racional e fria"],
     goal: "Pedir um aumento de 20%. Estou há 2 anos sem reajuste, assumi novas responsabilidades e lidero 2 projetos estratégicos.",
-    tone: "firme"
+    tone: "firme",
   },
   {
     id: "feedback",
@@ -24,7 +19,7 @@ const SCENES = [
     rel: "Colega de trabalho",
     traits: ["defensiva", "muito emotiva"],
     goal: "Dar um feedback honesto: o Bruno entrega trabalhos com erros frequentes e isso está travando o time. Preciso ser claro sem destruir o relacionamento.",
-    tone: "empático"
+    tone: "empático",
   },
   {
     id: "divida",
@@ -35,7 +30,7 @@ const SCENES = [
     rel: "Amigo(a)",
     traits: ["passivo-agressiva", "fria e distante"],
     goal: "Cobrar R$ 2.000 emprestados há 3 meses. O Carlos para de responder quando o assunto aparece.",
-    tone: "direto"
+    tone: "direto",
   },
   {
     id: "contrato",
@@ -46,7 +41,7 @@ const SCENES = [
     rel: "Prestador / fornecedor",
     traits: ["defensiva", "explosiva"],
     goal: "Comunicar o encerramento do contrato. Três atrasos críticos nos fizeram perder um cliente importante.",
-    tone: "firme"
+    tone: "firme",
   },
   {
     id: "prazo",
@@ -57,7 +52,7 @@ const SCENES = [
     rel: "Cliente",
     traits: ["racional e fria", "explosiva"],
     goal: "Pedir mais 5 dias de prazo por um problema técnico inesperado, sem perder a confiança dela.",
-    tone: "diplomático"
+    tone: "diplomático",
   },
   {
     id: "demissao",
@@ -68,6 +63,6 @@ const SCENES = [
     rel: "Colega de trabalho",
     traits: ["muito emotiva", "manipuladora"],
     goal: "Comunicar o desligamento de um funcionário de 3 anos com queda constante de performance. Preciso ser humano e firme ao mesmo tempo.",
-    tone: "empático"
-  }
+    tone: "empático",
+  },
 ];

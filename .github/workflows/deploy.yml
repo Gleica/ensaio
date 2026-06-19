@@ -27,7 +27,7 @@ jobs:
       - name: Inject shared API key
         env:
           ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_KEY }}
-        run: sed -i "s|__SHARED_KEY__|${ANTHROPIC_KEY}|g" js/claude.js
+        run: sed -i "s|__SHARED_KEY__|${ANTHROPIC_KEY}|g" js/session.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

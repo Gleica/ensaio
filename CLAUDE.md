@@ -18,25 +18,53 @@ Opening `index.html` directly in a browser also works, though a local server avo
 ## File structure
 
 ```
-index.html                        ← HTML structure + all CSS (no inline JS)
-js/claude.js                      ← API layer: keys, fetch wrappers, prompts, parsers
-js/app.js                         ← state, UI, setup form, simulator, rate limiting, demo mode
-js/scenes.js                      ← SCENES array: 6 pre-built conversation scenarios
-.github/workflows/deploy.yml      ← GitHub Actions: injects ANTHROPIC_KEY secret and deploys to Pages
+index.html                        ← HTML structure only (no CSS, no inline JS)
+styles/main.css                   ← All CSS (extracted from index.html)
+js/
+  main.js                         ← Entry point: init(), all event listeners
+  config.js                       ← All constants (API_URL, LIMITS, MAX_TOKENS, etc.)
+  session.js                      ← SHARED_KEY placeholder, isSharedMode(), getKey(), getModel()
+  prompts.js                      ← System prompts: personaSystem, coachSystem, reportSystem, suggestSystem
+  state.js                        ← createState(), resetSession(state)
+  rateLimit.js                    ← getUsage(), saveUsage(), guardSessionStart(), consumeSession(), canSendMessage()
+  api/
+    anthropic.js                  ← HTTP transport: callClaude(), callClaudeStream()
+  lib/
+    parse.js                      ← parseJSON(), extractPartialFala()
+    transcript.js                 ← buildTranscript(history)
+    mood.js                       ← moodScale(value) → {emoji, label, color}
+    escape.js                     ← escapeHtml(s)
+  data/
+    scenes.js                     ← SCENES array (6 pre-built scenarios)
+    demo.js                       ← DEMO object (scripted conversation)
+  ui/
+    chat.js                       ← addBubble(), addThought(), scrollChat()
+    moodMeter.js                  ← setMood(state, value)
+    moodChart.js                  ← buildMoodChartSvg(history), renderMoodChart(history)
+    coach.js                      ← renderCoach(coachData)
+    report.js                     ← renderReport(report)
+    setupForm.js                  ← readSetup(state), loadScene(scene), renderSceneGallery(onSceneClick)
+    screens.js                    ← showSim(state), showSetup()
+    msgCounter.js                 ← updateMsgCounter(state)
+  controllers/
+    rehearsal.js                  ← startRehearsal(state), suggestOpening(state), sendMessage(state, text)
+    feedback.js                   ← requestCoach(state), generateReport(state)
+    demo.js                       ← runDemo(state), demoReply(state), demoCoach()
+.github/workflows/deploy.yml      ← GitHub Actions: injects ANTHROPIC_KEY secret into js/session.js and deploys to Pages
 ```
 
-`index.html` loads `js/scenes.js`, `js/claude.js`, then `js/app.js` as plain `<script src>` tags in that order. No bundler, no framework, no backend.
+`index.html` loads only `<script type="module" src="js/main.js">`. The browser resolves all ES module imports. No bundler, no framework, no backend.
 
 ## Architecture
 
 ### Key design decisions
 
-- **BYOK + shared mode:** `SHARED_KEY` constant in `claude.js` (set to `"__SHARED_KEY__"` in source; GitHub Actions injects the real key at deploy time via `sed`). `getKey()` returns `SHARED_KEY` if set, otherwise falls back to `sessionStorage`. Users can always override with their own key via the ⚙︎ modal.
-- **Single `state` object:** All runtime state lives in one plain object in `app.js`. Never mutated across async boundaries without intent.
-- **Three AI roles via separate system prompts:** `personaSystem(state)` (impersonates the other person → `{fala, humor, pensamento}`), `coachSystem(state)` (communication coach → `{analise, sugestao}`), `reportSystem(state)` (end-of-session evaluator → structured report JSON).
-- **Streaming persona responses:** `callClaudeStream()` parses SSE chunks; `extractPartialFala()` progressively extracts the `"fala"` value from incomplete JSON so the bubble updates character by character.
-- **Demo mode:** `DEMO` constant in `app.js` holds a fully scripted conversation. `state.demo = true` gates all API calls to `demoReply()` / `demoCoach()` instead. Demo does not consume API tokens and does not count toward rate limits.
-- **Rate limiting (shared mode only):** When `isSharedMode()` is true, `getUsage()` / `saveUsage()` track daily session count in `localStorage` (key: `ensaio_usage`, value: `{date, sessions}`). Session message count lives in `state.msgCount`. Limits defined in `LIMITS` constant (`msgsPerSession: 8`, `sessionsPerDay: 3`).
+- **BYOK + shared mode:** `SHARED_KEY` constant in `js/session.js` (set to `"__SHARED_KEY__"` in source; GitHub Actions injects the real key at deploy time via `sed`). `isSharedMode()` returns `true` only when `SHARED_KEY` is set AND does NOT start with `"__"` — this prevents 401 errors locally. `getKey()` returns `SHARED_KEY` if in shared mode, otherwise falls back to `sessionStorage`. Users can always override with their own key via the ⚙︎ modal.
+- **Single `state` object:** All runtime state lives in one plain object created by `createState()` in `state.js`. Passed by reference to all controllers and UI helpers; never reassigned (field-level mutation only).
+- **Three AI roles via separate system prompts:** `personaSystem(state)` (impersonates the other person → `{fala, humor, pensamento}`), `coachSystem(state)` (communication coach → `{analise, sugestao}`), `reportSystem(state)` (end-of-session evaluator → structured report JSON), `suggestSystem(state)` (opening line suggestion → plain text).
+- **Streaming persona responses:** `callClaudeStream()` in `api/anthropic.js` parses SSE chunks; `extractPartialFala()` in `lib/parse.js` progressively extracts the `"fala"` value from incomplete JSON so the bubble updates character by character.
+- **Demo mode:** `DEMO` object in `data/demo.js` holds a fully scripted conversation. `state.demo = true` gates all API calls to `demoReply()` / `demoCoach()` in `controllers/demo.js`. Demo does not consume API tokens and does not count toward rate limits.
+- **Rate limiting (shared mode only):** When `isSharedMode()` is true, `getUsage()` / `saveUsage()` in `rateLimit.js` track daily session count in `localStorage` (key: `ensaio_usage`, value: `{date, sessions}`). `guardSessionStart()` returns `{ok, message?, usage?}` — callers call `consumeSession(usage)` only after confirming `ok`. Limits defined in `LIMITS` constant in `config.js` (`msgsPerSession: 8`, `sessionsPerDay: 3`).
 
 ### State object
 
@@ -64,30 +92,19 @@ let state = {
 - `#keyModal` — API key and model name entry
 - `#reportModal` — end-of-session report display
 
-### Core functions
+### Core functions by layer
 
 | File | Function | Purpose |
 |---|---|---|
-| `claude.js` | `getKey()` | Returns `SHARED_KEY` or `sessionStorage` key |
-| `claude.js` | `callClaude(system, messages, maxTokens)` | Non-streaming fetch to Anthropic API |
-| `claude.js` | `callClaudeStream(system, messages, maxTokens, onChunk)` | Streaming fetch; calls `onChunk(delta, accumulated)` per SSE chunk |
-| `claude.js` | `parseJSON(txt)` | Extracts first JSON object from text (handles markdown fences) |
-| `claude.js` | `extractPartialFala(accumulated)` | Extracts partial `"fala"` value from incomplete JSON during streaming |
-| `claude.js` | `personaSystem(state)` | Builds persona system prompt; injects difficulty modifier |
-| `claude.js` | `coachSystem(state)` | Builds coach system prompt |
-| `claude.js` | `reportSystem(state)` | Builds end-of-session report system prompt |
-| `app.js` | `isSharedMode()` | Returns true when `SHARED_KEY` is set |
-| `app.js` | `getUsage()` / `saveUsage(d)` | Read/write daily session counter in localStorage |
-| `app.js` | `updateMsgCounter()` | Updates `#msgCounter` tag; disables input at limit |
-| `app.js` | `openSim()` | Transitions setup → simulator; checks daily session limit in shared mode |
-| `app.js` | `send()` | Handles user message; streams persona response; updates mood + chart |
-| `app.js` | `renderMoodChart()` | Renders pure SVG mood arc (400×90 viewBox, responsive width) |
-| `app.js` | `renderCoach(j)` | Renders coach feedback box with "Usar" button |
-| `app.js` | `renderReport(j)` | Renders report modal (score circle, sections, best quote) |
-| `app.js` | `renderSceneGallery()` | Populates `#scenesGallery` from `SCENES` array |
-| `app.js` | `loadScene(scene)` | Fills setup form from a scene object and marks it active |
-| `app.js` | `setMood(v)` | Updates mood meter width + emoji + label from 0–100 value |
-| `app.js` | `escapeHtml(s)` | Sanitizes strings before injecting into innerHTML |
+| `session.js` | `isSharedMode()` | True only when SHARED_KEY is injected (not `__` placeholder) |
+| `session.js` | `getKey()` | Returns SHARED_KEY or sessionStorage key |
+| `api/anthropic.js` | `callClaude(key, model, system, messages, maxTokens)` | Non-streaming fetch to Anthropic API |
+| `api/anthropic.js` | `callClaudeStream(key, model, system, messages, maxTokens, onChunk)` | Streaming SSE fetch; calls `onChunk(delta, accumulated)` per chunk |
+| `lib/parse.js` | `parseJSON(txt)` | Extracts first JSON object from text (handles markdown fences) |
+| `lib/parse.js` | `extractPartialFala(accumulated)` | Extracts partial `"fala"` value from incomplete JSON during streaming |
+| `rateLimit.js` | `guardSessionStart()` | Returns `{ok, message?, usage?}` — never calls alert() itself |
+| `controllers/rehearsal.js` | `sendMessage(state, text)` | Receives text as parameter because main.js adds the bubble and clears input before dispatching |
+| `ui/moodChart.js` | `buildMoodChartSvg(history)` | Pure function → SVG string (testable without DOM) |
 
 ## API usage
 
@@ -101,7 +118,7 @@ let state = {
 
 Pushes to `main` trigger `.github/workflows/deploy.yml`, which:
 1. Checks out the repo
-2. Runs `sed -i "s|__SHARED_KEY__|${ANTHROPIC_KEY}|g" js/claude.js` using the `ANTHROPIC_KEY` GitHub Secret
+2. Runs `sed -i "s|__SHARED_KEY__|${ANTHROPIC_KEY}|g" js/session.js` using the `ANTHROPIC_KEY` GitHub Secret
 3. Uploads the result as a Pages artifact and deploys
 
 The real key never appears in git history. To rotate the key: update the GitHub Secret and re-run the workflow.
