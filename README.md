@@ -71,17 +71,15 @@ Abrir `index.html` diretamente no browser também funciona, mas um servidor loca
 
 ## Como usar
 
-1. Abra a aplicação.
-2. Clique em **▶ Ver demonstração** para conhecer o fluxo sem precisar de chave, **ou**
-3. Clique em **⚙︎ Chave** (topo), cole sua chave da Anthropic e salve.
-4. Escolha uma cena da biblioteca ou preencha os campos manualmente.
-5. Selecione a dificuldade e clique em **Começar o ensaio**.
-6. Converse, observe o humor e o pensamento da outra pessoa.
-7. Use **🎯 Como fui?** para feedback imediato ou **📋 Relatório final** ao encerrar.
+A aplicação publicada funciona sem nenhuma configuração — basta acessar o link e começar.
 
-### Como conseguir uma chave da Anthropic
-
-Acesse [console.anthropic.com](https://console.anthropic.com/) → **API Keys** → **Create Key**. A chave começa com `sk-ant-`. Cole no botão ⚙︎ Chave do app.
+1. Abra [https://gleica.github.io/ensaio/](https://gleica.github.io/ensaio/).
+2. Clique em **▶ Ver demonstração** para um tour guiado sem interação com a IA, **ou**
+3. Escolha uma cena da biblioteca ou preencha os campos manualmente.
+4. Selecione a dificuldade e clique em **Começar o ensaio**.
+5. Converse com a IA no papel da outra pessoa. Observe o termômetro de humor e ative o pensamento oculto se quiser.
+6. Use **🎯 Como fui?** para feedback imediato a qualquer momento ou **📋 Relatório final** ao encerrar a sessão.
+7. Clique em **↺ Nova cena** (canto superior direito do chat) para recomeçar com outra situação.
 
 ## Privacidade
 
