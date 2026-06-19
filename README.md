@@ -55,8 +55,9 @@ A maioria dos assistentes de IA te dá *a resposta certa*. O EnsaIA te dá **o t
 ## Tecnologias utilizadas
 
 - **HTML, CSS e JavaScript puro** (vanilla) — zero dependências, zero build step.
-- **API da Anthropic (Claude Sonnet)** — chamadas direto do navegador com o cabeçalho `anthropic-dangerous-direct-browser-access`. Modo BYOK: chave fica só no `sessionStorage` do usuário. Modo compartilhado: chave injetada via GitHub Actions secret, nunca exposta no repositório.
-- **GitHub Pages + GitHub Actions** — hospedagem estática com deploy automatizado e injeção segura de secrets.
+- **API da Anthropic (Claude Sonnet 4.6)** — Modo BYOK: chamadas direto do navegador com `anthropic-dangerous-direct-browser-access`, chave no `sessionStorage`. Modo compartilhado: chamadas via proxy Cloudflare Worker, chave da Anthropic nunca enviada ao browser.
+- **Cloudflare Worker** — proxy server-side que guarda a `ANTHROPIC_KEY` como secret, aplica rate limiting (30 req/IP/dia via KV) e valida a origem das requisições.
+- **GitHub Pages + GitHub Actions** — deploy automatizado que injeta a URL do Worker em `js/config.js` via secret `PROXY_URL`, sem expor a chave da Anthropic no código.
 
 ## Como executar localmente
 
