@@ -7,7 +7,7 @@ const $ = id => document.getElementById(id);
 
 let state = {
   who: "", rel: "", traits: [], goal: "", tone: "firme",
-  mood: 50, history: [], demo: false, demoStep: 0
+  mood: 50, history: [], moodHistory: [], demo: false, demoStep: 0
 };
 
 /* ---------- chips ---------- */
@@ -94,6 +94,9 @@ function openSim(){
   $("demoTag").classList.toggle("hide", !state.demo);
   $("chat").innerHTML = "";
   $("coachBox").innerHTML = "";
+  $("moodChart").innerHTML = "";
+  $("moodChart").classList.add("hide");
+  state.moodHistory = [];
   setMood(50);
 }
 
@@ -154,7 +157,11 @@ async function send(){
     const j = parseJSON(raw) || { fala: raw, humor: state.mood, pensamento: "" };
     bubble.textContent = j.fala || "...";
     if(j.pensamento) addThought(j.pensamento);
-    if(typeof j.humor === "number") setMood(j.humor);
+    if(typeof j.humor === "number"){
+      setMood(j.humor);
+      state.moodHistory.push(j.humor);
+      renderMoodChart();
+    }
     state.history.push({ role: "assistant", content: raw });
   }catch(e){
     bubble.classList.remove("streaming");
@@ -234,7 +241,7 @@ const DEMO = {
 
 $("demoBtn").onclick = () => {
   state = { who: DEMO.who, rel: DEMO.rel, traits: ["defensiva"], goal: "pedir um aumento para o gestor", tone: "firme",
-            mood: DEMO.openMood, history: [], demo: true, demoStep: 0 };
+            mood: DEMO.openMood, history: [], moodHistory: [], demo: true, demoStep: 0 };
   openSim();
   addBubble(DEMO.opening, "them");
   addThought(DEMO.openThink);
@@ -257,6 +264,8 @@ function demoReply(){
     addBubble(t.fala, "them");
     addThought(t.pensamento);
     setMood(t.humor);
+    state.moodHistory.push(t.humor);
+    renderMoodChart();
     state.demoStep++;
     const next = DEMO.suggestions[state.demoStep];
     if(next) $("input").value = next;
@@ -264,6 +273,71 @@ function demoReply(){
 }
 
 function demoCoach(){ renderCoach(DEMO.coach); }
+
+/* ---------- gráfico de humor ---------- */
+function renderMoodChart(){
+  const container = $("moodChart");
+  if(!container) return;
+  const h = state.moodHistory;
+  if(h.length < 2){ container.classList.add("hide"); return; }
+  container.classList.remove("hide");
+
+  const W = 400, H = 90;
+  const pad = { top: 14, right: 18, bottom: 20, left: 30 };
+  const iW = W - pad.left - pad.right;
+  const iH = H - pad.top - pad.bottom;
+
+  const mapY = v => (pad.top + iH - (Math.max(0, Math.min(100, v)) / 100) * iH).toFixed(1);
+  const mapX = i => (pad.left + (h.length < 2 ? iW / 2 : (i / (h.length - 1)) * iW)).toFixed(1);
+
+  const last = h[h.length - 1];
+  const col = last < 35 ? "var(--bad)" : last < 65 ? "var(--warn)" : "var(--ok)";
+
+  const pts = h.map((v, i) => `${mapX(i)},${mapY(v)}`).join(" ");
+
+  const n = h.length - 1;
+  const baseline = (pad.top + iH).toFixed(1);
+  const area = [
+    `M ${mapX(0)},${mapY(h[0])}`,
+    ...h.slice(1).map((v, i) => `L ${mapX(i + 1)},${mapY(v)}`),
+    `L ${mapX(n)},${baseline} L ${mapX(0)},${baseline} Z`
+  ].join(" ");
+
+  const x0 = pad.left.toFixed(1), x1 = (pad.left + iW).toFixed(1);
+  const grid = [
+    `<line x1="${x0}" y1="${mapY(100)}" x2="${x1}" y2="${mapY(100)}" stroke="var(--line)" stroke-width="0.5"/>`,
+    `<line x1="${x0}" y1="${mapY(50)}" x2="${x1}" y2="${mapY(50)}" stroke="var(--line)" stroke-width="0.5" stroke-dasharray="4,3"/>`,
+    `<line x1="${x0}" y1="${baseline}" x2="${x1}" y2="${baseline}" stroke="var(--line)" stroke-width="0.5"/>`,
+  ].join("");
+
+  const yLabels = [[100,"😄"],[50,"😐"],[0,"😡"]].map(([v, em]) =>
+    `<text x="${(pad.left - 5).toFixed(1)}" y="${parseFloat(mapY(v)) + 4}" text-anchor="end" font-size="11">${em}</text>`
+  ).join("");
+
+  const xLabels = h.map((_, i) =>
+    `<text x="${mapX(i)}" y="${H - 3}" text-anchor="middle" fill="var(--muted)" font-size="9">${i + 1}</text>`
+  ).join("");
+
+  const dots = h.map((v, i) => {
+    const c = v < 35 ? "var(--bad)" : v < 65 ? "var(--warn)" : "var(--ok)";
+    const r = i === h.length - 1 ? 5 : 3.5;
+    return `<circle cx="${mapX(i)}" cy="${mapY(v)}" r="${r}" fill="${c}" stroke="var(--card)" stroke-width="1.5"/>`;
+  }).join("");
+
+  container.innerHTML = `<p class="mood-chart-label">📈 Arco emocional da conversa</p>
+<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">
+  <defs>
+    <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="${col}" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+  ${grid}${yLabels}${xLabels}
+  <path d="${area}" fill="url(#cg)"/>
+  <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  ${dots}
+</svg>`;
+}
 
 /* ---------- biblioteca de cenas ---------- */
 function loadScene(scene){
