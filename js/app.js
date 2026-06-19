@@ -67,10 +67,16 @@ $("keySave").onclick = () => {
   $("keyModal").classList.remove("on");
 };
 
+$("rel").onchange = () => {
+  $("relOther").classList.toggle("hide", $("rel").value !== "Outro");
+};
+
 /* ---------- coleta do setup ---------- */
 function readSetup(){
   state.who    = $("who").value.trim() || "a outra pessoa";
-  state.rel    = $("rel").value;
+  state.rel    = $("rel").value === "Outro"
+    ? ($("relOther").value.trim() || "Outro")
+    : $("rel").value;
   state.traits = [...document.querySelectorAll("#traits .chip.on")].map(c => c.dataset.v);
   state.goal   = $("goal").value.trim();
   state.tone       = (document.querySelector("#tones .chip.on")       || { dataset: { v: "firme"  } }).dataset.v;
@@ -447,6 +453,7 @@ function renderMoodChart(){
 function loadScene(scene){
   $("who").value = scene.who;
   [...$("rel").options].forEach(o => { o.selected = o.text === scene.rel; });
+  $("relOther").classList.add("hide"); $("relOther").value = "";
   document.querySelectorAll("#traits .chip").forEach(c => {
     c.classList.toggle("on", scene.traits.includes(c.dataset.v));
   });
