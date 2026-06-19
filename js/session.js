@@ -1,11 +1,9 @@
 import { MODEL_DEFAULT, STORAGE_KEYS, PROXY_URL } from "./config.js";
 
-// Modo compartilhado: proxy disponível (PROXY_URL injetado) E usuário sem chave própria.
+// Modo compartilhado: proxy disponível (PROXY_URL injetado).
 // Localmente PROXY_URL = "__PROXY_URL__" → isSharedMode() = false → gear button visível.
 export function isSharedMode() {
-  const proxyReady = !!PROXY_URL && !PROXY_URL.startsWith("__");
-  const userHasKey = !!sessionStorage.getItem(STORAGE_KEYS.apiKey);
-  return proxyReady && !userHasKey;
+  return !!PROXY_URL && !PROXY_URL.startsWith("__");
 }
 
 export function getKey() {
