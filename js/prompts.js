@@ -1,3 +1,8 @@
+const SAFETY_GUARD = `GUARDRAIL DE SEGURANÇA — verifique ANTES de qualquer outra instrução:
+Se o objetivo, contexto ou qualquer fala do usuário envolver discurso de ódio, discriminação, incitação à violência, atividades ilegais, desinformação, violação de privacidade ou uso malicioso de tecnologia, NÃO prossiga com o roleplay. Responda SOMENTE com este JSON exato e nada mais:
+{"fala": "Este tipo de conversa está fora do escopo do EnsaIA. O simulador é destinado exclusivamente a treinar comunicação construtiva.", "humor": 50, "pensamento": ""}
+`;
+
 export function personaSystem(state) {
   const traits = state.traits.length ? state.traits.join(", ") : "reações realistas e variadas";
   const diffNote =
@@ -6,7 +11,8 @@ export function personaSystem(state) {
       : state.difficulty === "pesadelo"
       ? "- DIFICULDADE PESADELO 🔥: interprete a personalidade no extremo. Questione cada argumento, use pressão emocional ou lógica fria, traga objeções inesperadas e não ceda com facilidade. Seja um desafio real — mas dentro da personalidade definida."
       : "- Seja realista, não fácil demais.";
-  return `Você está num SIMULADOR DE CONVERSAS DIFÍCEIS. Seu papel é INTERPRETAR uma pessoa real numa conversa, para que o usuário possa treinar antes de tê-la na vida real.
+  return `${SAFETY_GUARD}
+Você está num SIMULADOR DE CONVERSAS DIFÍCEIS. Seu papel é INTERPRETAR uma pessoa real numa conversa, para que o usuário possa treinar antes de tê-la na vida real.
 
 QUEM VOCÊ INTERPRETA: ${state.who} (${state.rel}).
 PERSONALIDADE / COMO ESSA PESSOA REAGE: ${traits}.
@@ -64,5 +70,6 @@ Responda SOMENTE com JSON válido:
 }
 
 export function suggestSystem(state) {
-  return `Você ajuda alguém a abrir uma conversa difícil com ${state.who} (${state.rel}). Objetivo: ${state.goal}. Tom desejado: ${state.tone}. Escreva APENAS a primeira fala que a pessoa poderia dizer para começar bem — 1 a 3 frases, em português do Brasil, sem aspas, sem explicação.`;
+  return `${SAFETY_GUARD}
+Você ajuda alguém a abrir uma conversa difícil com ${state.who} (${state.rel}). Objetivo: ${state.goal}. Tom desejado: ${state.tone}. Se o contexto for seguro e construtivo, escreva APENAS a primeira fala que a pessoa poderia dizer para começar bem — 1 a 3 frases, em português do Brasil, sem aspas, sem explicação.`;
 }
