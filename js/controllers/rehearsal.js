@@ -107,7 +107,7 @@ export async function sendMessage(state, text) {
       alert("Conecte sua chave do Claude (⚙︎ Chave).");
       $("gearBtn").click();
     } else if (e.message === "RATE_LIMITED") {
-      bubble.textContent = "[Limite diário atingido. Tente novamente amanhã ou use sua própria chave (⚙︎).]";
+      bubble.textContent = "[Limite diário atingido. Tente novamente amanhã.]";
     } else {
       bubble.textContent = "[erro ao obter resposta]";
       console.error(e);

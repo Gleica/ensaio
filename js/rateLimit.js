@@ -23,7 +23,7 @@ export function guardSessionStart() {
   if (usage.sessions >= LIMITS.sessionsPerDay) {
     return {
       ok: false,
-      message: `Você já usou suas ${LIMITS.sessionsPerDay} sessões gratuitas de hoje. Volte amanhã ou conecte sua própria chave (⚙︎ Chave).`,
+      message: `Você já usou suas ${LIMITS.sessionsPerDay} sessões gratuitas de hoje. Volte amanhã para continuar.`,
     };
   }
   return { ok: true, usage };

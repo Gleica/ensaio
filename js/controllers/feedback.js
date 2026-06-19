@@ -26,7 +26,7 @@ export async function requestCoach(state) {
     renderCoach(coachData);
   } catch (e) {
     const msg = e.message === "RATE_LIMITED"
-      ? "Limite diário atingido. Tente novamente amanhã ou use sua própria chave (⚙︎)."
+      ? "Limite diário atingido. Tente novamente amanhã."
       : "Erro ao gerar feedback. Tente novamente.";
     alert(msg);
     console.error(e);
@@ -72,7 +72,7 @@ export async function generateReport(state) {
   } catch (e) {
     clearInterval(stepTimer);
     const msg = e.message === "RATE_LIMITED"
-      ? "Limite diário atingido. Tente novamente amanhã ou use sua própria chave (⚙︎)."
+      ? "Limite diário atingido. Tente novamente amanhã."
       : "Erro ao gerar relatório. Tente novamente.";
     $("reportContent").innerHTML = `<p style="color:var(--bad)">${msg}</p>`;
     console.error(e);

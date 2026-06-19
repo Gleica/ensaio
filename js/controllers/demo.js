@@ -29,7 +29,7 @@ export function runDemo(state) {
 export function demoReply(state) {
   const turn = DEMO.turns[state.demoStep];
   if (!turn) {
-    addBubble("Fim da demonstração 🎬 Conecte sua chave (⚙︎) para ensaiar a SUA conversa de verdade.", "them");
+    addBubble("Fim da demonstração 🎬 Clique em ↺ Nova cena para montar a SUA conversa de verdade.", "them");
     return;
   }
   const typing = document.createElement("div");
