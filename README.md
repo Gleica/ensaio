@@ -2,7 +2,7 @@
 
 > Um simulador de IA onde você ensaia aquela conversa que dá frio na barriga — pedir aumento, cobrar um cliente, dar uma notícia ruim, terminar um contrato — **conversando com a outra pessoa antes de ela existir de verdade**.
 
-**Aplicação no ar:** _(cole aqui o link do GitHub Pages depois de publicar)_
+**Aplicação no ar:** _[https://gleica.github.io/ensaio/)_
 **Vídeo de apresentação:** _(cole aqui o link do Loom/YouTube)_
 
 ---
