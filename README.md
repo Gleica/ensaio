@@ -1,4 +1,4 @@
-# 🎭 Ensaio — treine a conversa difícil antes de ela acontecer
+# 🎭 EnsaIA — treine a conversa difícil antes de ela acontecer
 
 > Um simulador de IA onde você ensaia aquela conversa que dá frio na barriga — pedir aumento, cobrar um cliente, dar uma notícia ruim, terminar um contrato — **conversando com a outra pessoa antes de ela existir de verdade**.
 
@@ -14,7 +14,7 @@ As ferramentas de IA que existem hoje só reescrevem o texto da mensagem. Mas o 
 
 ## A solução
 
-O **Ensaio** vira esse jogo do avesso. Você descreve com quem vai falar e como essa pessoa costuma reagir, e a IA **encarna essa pessoa**. Você conversa de verdade, em tempo real, e ela reage como reagiria — empurra de volta, se fecha, ou abre, dependendo de como você conduz.
+O **EnsaIA** vira esse jogo do avesso. Você descreve com quem vai falar e como essa pessoa costuma reagir, e a IA **encarna essa pessoa**. Você conversa de verdade, em tempo real, e ela reage como reagiria — empurra de volta, se fecha, ou abre, dependendo de como você conduz.
 
 E o diferencial: enquanto você conversa, você vê duas coisas que na vida real são invisíveis:
 
@@ -26,7 +26,7 @@ No fim, o botão **"📋 Relatório final"** gera um relatório completo: nota (
 
 ## O diferencial
 
-A maioria dos assistentes de IA te dá *a resposta certa*. O Ensaio te dá **o treino** — e o feedback que mostra o invisível de uma conversa real: a emoção e o pensamento do outro lado. É um simulador de voo para conversas humanas.
+A maioria dos assistentes de IA te dá *a resposta certa*. O EnsaIA te dá **o treino** — e o feedback que mostra o invisível de uma conversa real: a emoção e o pensamento do outro lado. É um simulador de voo para conversas humanas.
 
 ## Como funciona (em 4 passos)
 
@@ -57,7 +57,6 @@ A maioria dos assistentes de IA te dá *a resposta certa*. O Ensaio te dá **o t
 - **HTML, CSS e JavaScript puro** (vanilla) — zero dependências, zero build step.
 - **API da Anthropic (Claude Sonnet)** — chamadas direto do navegador com o cabeçalho `anthropic-dangerous-direct-browser-access`. Modo BYOK: chave fica só no `sessionStorage` do usuário. Modo compartilhado: chave injetada via GitHub Actions secret, nunca exposta no repositório.
 - **GitHub Pages + GitHub Actions** — hospedagem estática com deploy automatizado e injeção segura de secrets.
-- Desenvolvido com o apoio da **TRAE** durante o Desafio TRAE + AI Brasil.
 
 ## Como executar localmente
 

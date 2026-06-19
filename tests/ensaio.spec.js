@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 
 const BASE_URL = 'http://localhost:9000';
 
-test.describe('Ensaio — critical user journeys', () => {
+test.describe('EnsaIA — critical user journeys', () => {
   test('1. Page loads — title correct, no JS console errors', async ({ page }) => {
     const errors = [];
 
@@ -14,7 +14,7 @@ test.describe('Ensaio — critical user journeys', () => {
 
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
 
-    await expect(page).toHaveTitle(/Ensaio/);
+    await expect(page).toHaveTitle(/EnsaIA/);
 
     expect(errors, `JS errors on load: ${errors.join('; ')}`).toHaveLength(0);
   });

@@ -6,7 +6,7 @@ compatibility_date = "2024-09-23"
 # substitua PLACEHOLDER_KV_ID pelo ID retornado pelo comando.
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "PLACEHOLDER_KV_ID"
+id = "9ae05cba8f26459b9563f3389646d0b0"
 
 # A chave da Anthropic é configurada como secret (nunca vai neste arquivo):
 # wrangler secret put ANTHROPIC_KEY

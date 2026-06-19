@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-**Ensaio** is a static web app (vanilla JS, zero dependencies, zero build) that lets users rehearse difficult conversations with an AI that role-plays the other person. Built for the TRAE + AI Brasil challenge (June 2026). Deployed on GitHub Pages via GitHub Actions.
+**EnsaIA** is a static web app (vanilla JS, zero dependencies, zero build) that lets users rehearse difficult conversations with an AI that role-plays the other person. Built for the TRAE + AI Brasil challenge (June 2026). Deployed on GitHub Pages via GitHub Actions.
 
 ## Running locally
 
