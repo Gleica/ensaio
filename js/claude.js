@@ -12,8 +12,9 @@ const API_URL = "https://api.anthropic.com/v1/messages";
 // Troque por "" para voltar ao modo BYOK puro.
 const SHARED_KEY = "__SHARED_KEY__";
 
-function getKey(){ return SHARED_KEY || sessionStorage.getItem("ensaio_key") || ""; }
-function getModel(){ return SHARED_KEY ? "claude-sonnet-4-6" : (sessionStorage.getItem("ensaio_model") || "claude-sonnet-4-6"); }
+function isSharedMode(){ return !!SHARED_KEY && !SHARED_KEY.startsWith("__"); }
+function getKey(){ return isSharedMode() ? SHARED_KEY : (sessionStorage.getItem("ensaio_key") || ""); }
+function getModel(){ return isSharedMode() ? "claude-sonnet-4-6" : (sessionStorage.getItem("ensaio_model") || "claude-sonnet-4-6"); }
 
 /* chamada simples — coach, sugestão */
 async function callClaude(system, messages, maxTokens = 700){

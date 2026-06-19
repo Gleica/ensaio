@@ -7,8 +7,6 @@ const $ = id => document.getElementById(id);
 
 const LIMITS = { msgsPerSession: 8, sessionsPerDay: 3 };
 
-function isSharedMode(){ return !!SHARED_KEY; }
-
 function getUsage(){
   const today = new Date().toISOString().slice(0, 10);
   try{
@@ -170,14 +168,31 @@ $("startBtn").onclick = () => {
 $("suggestBtn").onclick = async () => {
   readSetup();
   if(!getKey()){ alert("Conecte sua chave do Claude (⚙︎ Chave) para gerar sugestões."); $("gearBtn").click(); return; }
-  $("suggestBtn").disabled = true; $("suggestBtn").textContent = "Gerando...";
+  if(isSharedMode()){
+    const usage = getUsage();
+    if(usage.sessions >= LIMITS.sessionsPerDay){
+      alert(`Você já usou suas ${LIMITS.sessionsPerDay} sessões gratuitas de hoje. Volte amanhã ou conecte sua própria chave (⚙︎ Chave).`);
+      return;
+    }
+    usage.sessions++;
+    saveUsage(usage);
+  }
+  state.demo = false; state.history = []; state.msgCount = 0;
+  openSim();
+  updateMsgCounter();
+  $("sendBtn").disabled = true;
+  $("input").placeholder = "Gerando sua primeira fala…";
   try{
     const sys = `Você ajuda alguém a abrir uma conversa difícil com ${state.who} (${state.rel}). Objetivo: ${state.goal}. Tom desejado: ${state.tone}. Escreva APENAS a primeira fala que a pessoa poderia dizer para começar bem — 1 a 3 frases, em português do Brasil, sem aspas, sem explicação.`;
     const out = await callClaude(sys, [{ role: "user", content: "Escreva a primeira fala." }], 250);
-    if(!$("sim").classList.contains("hide")){ $("input").value = out.trim(); }
-    else { alert("Sugestão de abertura:\n\n" + out.trim() + "\n\n(Clique em Começar o ensaio para usá-la.)"); }
-  }catch(e){ alert("Erro ao gerar: " + e.message); }
-  $("suggestBtn").disabled = false; $("suggestBtn").textContent = "💡 Sugerir minha 1ª fala";
+    $("input").value = out.trim();
+    $("input").placeholder = "Escreva o que você diria...";
+    addBubble("Sua primeira fala está pronta no campo abaixo. Edite se quiser e clique em Enviar para começar.", "them");
+  }catch(e){
+    $("input").placeholder = "Escreva o que você diria...";
+    alert("Erro ao gerar: " + e.message);
+  }
+  $("sendBtn").disabled = false;
 };
 
 /* ---------- enviar ---------- */
