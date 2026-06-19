@@ -7,8 +7,13 @@
 
 const API_URL = "https://api.anthropic.com/v1/messages";
 
-function getKey(){ return sessionStorage.getItem("ensaio_key") || ""; }
-function getModel(){ return sessionStorage.getItem("ensaio_model") || "claude-sonnet-4-6"; }
+// Chave compartilhada para o evento TRAE + AI Brasil.
+// Visível no source (intencional). Proteja via spending limit no console da Anthropic.
+// Troque por "" para voltar ao modo BYOK puro.
+const SHARED_KEY = "";
+
+function getKey(){ return SHARED_KEY || sessionStorage.getItem("ensaio_key") || ""; }
+function getModel(){ return SHARED_KEY ? "claude-sonnet-4-6" : (sessionStorage.getItem("ensaio_model") || "claude-sonnet-4-6"); }
 
 /* chamada simples — coach, sugestão */
 async function callClaude(system, messages, maxTokens = 700){

@@ -5,9 +5,38 @@
 
 const $ = id => document.getElementById(id);
 
+const LIMITS = { msgsPerSession: 8, sessionsPerDay: 3 };
+
+function isSharedMode(){ return !!SHARED_KEY; }
+
+function getUsage(){
+  const today = new Date().toISOString().slice(0, 10);
+  try{
+    const d = JSON.parse(localStorage.getItem("ensaio_usage") || "{}");
+    return d.date === today ? d : { date: today, sessions: 0 };
+  }catch(e){ return { date: new Date().toISOString().slice(0, 10), sessions: 0 }; }
+}
+function saveUsage(d){ localStorage.setItem("ensaio_usage", JSON.stringify(d)); }
+
+function updateMsgCounter(){
+  const el = $("msgCounter");
+  if(!el) return;
+  if(!isSharedMode() || state.demo){ el.classList.add("hide"); return; }
+  const used = state.msgCount;
+  const max = LIMITS.msgsPerSession;
+  el.textContent = `💬 ${used}/${max}`;
+  el.style.color = used >= max - 2 ? "var(--warn)" : "var(--muted)";
+  el.classList.remove("hide");
+  if(used >= max){
+    $("input").disabled = true;
+    $("sendBtn").disabled = true;
+    el.style.color = "var(--bad)";
+  }
+}
+
 let state = {
   who: "", rel: "", traits: [], goal: "", tone: "firme",
-  mood: 50, history: [], moodHistory: [], difficulty: "normal", demo: false, demoStep: 0
+  mood: 50, history: [], moodHistory: [], msgCount: 0, difficulty: "normal", demo: false, demoStep: 0
 };
 
 /* ---------- chips ---------- */
@@ -115,8 +144,18 @@ $("startBtn").onclick = () => {
     $("gearBtn").click();
     return;
   }
-  state.demo = false; state.history = [];
+  if(isSharedMode()){
+    const usage = getUsage();
+    if(usage.sessions >= LIMITS.sessionsPerDay){
+      alert(`Você já usou suas ${LIMITS.sessionsPerDay} sessões gratuitas de hoje. Volte amanhã ou conecte sua própria chave (⚙︎ Chave).`);
+      return;
+    }
+    usage.sessions++;
+    saveUsage(usage);
+  }
+  state.demo = false; state.history = []; state.msgCount = 0;
   openSim();
+  updateMsgCounter();
   addBubble("Tudo pronto. Mande sua primeira fala para " + state.who + " — eu reajo como ela reagiria.", "them");
 };
 
@@ -142,12 +181,15 @@ $("input").addEventListener("keydown", e => {
 async function send(){
   const text = $("input").value.trim();
   if(!text) return;
+  if(!state.demo && isSharedMode() && state.msgCount >= LIMITS.msgsPerSession) return;
   addBubble(text, "me");
   $("input").value = "";
 
   if(state.demo){ return demoReply(); }
 
   state.history.push({ role: "user", content: text });
+  state.msgCount++;
+  updateMsgCounter();
   $("sendBtn").disabled = true;
 
   const bubble = document.createElement("div");
@@ -266,7 +308,9 @@ function renderReport(j){
 
 /* ---------- reset ---------- */
 $("resetBtn").onclick = () => {
-  state.history = []; state.demo = false; state.demoStep = 0;
+  state.history = []; state.demo = false; state.demoStep = 0; state.msgCount = 0;
+  $("input").disabled = false;
+  $("sendBtn").disabled = false;
   $("sim").classList.add("hide"); $("setup").classList.remove("hide");
 };
 
