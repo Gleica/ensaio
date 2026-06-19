@@ -1,4 +1,4 @@
-import { getKey, getModel } from "../session.js";
+import { getKey, getModel, isSharedMode } from "../session.js";
 import { MAX_TOKENS } from "../config.js";
 import { callClaude, callClaudeStream } from "../api/anthropic.js";
 import { personaSystem, suggestSystem } from "../prompts.js";
@@ -16,7 +16,7 @@ const $ = id => document.getElementById(id);
 
 export async function startRehearsal(state) {
   readSetup(state);
-  if (!getKey()) {
+  if (!getKey() && !isSharedMode()) {
     alert("Para o ensaio ao vivo você precisa conectar sua chave do Claude (botão ⚙︎ Chave no topo). Ou clique em \"Ver demonstração\" para experimentar sem chave.");
     $("gearBtn").click();
     return;
@@ -34,7 +34,7 @@ export async function startRehearsal(state) {
 
 export async function suggestOpening(state) {
   readSetup(state);
-  if (!getKey()) {
+  if (!getKey() && !isSharedMode()) {
     alert("Conecte sua chave do Claude (⚙︎ Chave) para gerar sugestões.");
     $("gearBtn").click();
     return;
