@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ensaio — treine a conversa difícil antes de ela acontecer</title>
+<style>
+  :root{
+    --bg:#0f1020; --bg2:#16172e; --card:#1c1d38; --card2:#23254a;
+    --txt:#eef0ff; --muted:#9aa0c7; --line:#2c2e54;
+    --me:#5b6cff; --them:#2a2c52;
+    --accent:#ff5d8f; --accent2:#5b6cff; --ok:#34d39a; --warn:#ffce5b; --bad:#ff5b6e;
+    --shadow:0 10px 40px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,#27264f 0%,var(--bg) 55%) fixed,var(--bg);
+    color:var(--txt); min-height:100vh; line-height:1.45;
+  }
+  a{color:var(--accent2)}
+  .wrap{max-width:880px;margin:0 auto;padding:18px 16px 60px}
+  header.app{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;font-size:22px;box-shadow:var(--shadow)}
+  .brand h1{font-size:20px;margin:0;letter-spacing:.3px}
+  .brand p{margin:0;font-size:12.5px;color:var(--muted)}
+  .gear{background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:10px;
+    padding:8px 10px;cursor:pointer;font-size:13px}
+  .gear:hover{color:var(--txt)}
+
+  .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);
+    border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+  .card + .card{margin-top:14px}
+
+  label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;font-weight:600}
+  input[type=text],textarea,select{
+    width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--txt);
+    border-radius:12px;padding:12px 13px;font-size:15px;font-family:inherit;outline:none}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent2)}
+  textarea{resize:vertical;min-height:70px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--bg2);border:1px solid var(--line);color:var(--muted);border-radius:999px;
+    padding:8px 13px;font-size:13.5px;cursor:pointer;user-select:none}
+  .chip.on{background:linear-gradient(135deg,var(--accent2),#7b5bff);border-color:transparent;color:#fff}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row > *{flex:1;min-width:220px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;
+    border-radius:13px;padding:13px 18px;font-size:15px;font-weight:700;font-family:inherit}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),#ff7d52);color:#fff;box-shadow:var(--shadow)}
+  .btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+
+  .hint{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .demoline{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);display:flex;
+    align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .demoline span{font-size:13px;color:var(--muted)}
+
+  /* Simulador */
+  .scenebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .who{font-weight:700}
+  .tag{font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--line);
+    padding:3px 9px;border-radius:999px}
+  .mood{display:flex;align-items:center;gap:10px;margin:4px 0 14px}
+  .mood .emoji{font-size:26px}
+  .meter{flex:1;height:12px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);overflow:hidden}
+  .meter > i{display:block;height:100%;width:50%;border-radius:999px;
+    background:linear-gradient(90deg,var(--bad),var(--warn) 50%,var(--ok));transition:width .6s ease}
+  .moodlabel{font-size:12.5px;color:var(--muted);min-width:96px;text-align:right}
+
+  .chat{display:flex;flex-direction:column;gap:12px;max-height:48vh;overflow-y:auto;padding:6px 2px 6px 2px}
+  .msg{max-width:80%;padding:11px 14px;border-radius:16px;font-size:15px;white-space:pre-wrap;word-wrap:break-word}
+  .msg.them{background:var(--them);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:5px}
+  .msg.me{background:linear-gradient(135deg,var(--me),#7b5bff);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
+  .think{align-self:flex-start;max-width:80%;font-size:13px;color:var(--muted);font-style:italic;
+    background:rgba(255,255,255,.03);border:1px dashed var(--line);border-radius:12px;padding:8px 12px;margin-top:-4px}
+  .think b{color:var(--accent);font-style:normal}
+  .typing{align-self:flex-start;color:var(--muted);font-size:14px;padding:6px 4px}
+
+  .composer{display:flex;gap:10px;margin-top:14px}
+  .composer textarea{min-height:48px;max-height:120px}
+  .tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .tools .btn{padding:10px 14px;font-size:13.5px}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+  .toggle input{width:auto}
+
+  .coach{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--bg2)}
+  .coach h3{margin:0 0 8px;font-size:14px;color:var(--accent)}
+  .coach p{margin:6px 0;font-size:14px}
+  .coach .sug{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+  .coach .sug b{color:var(--ok)}
+
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(5,6,16,.75);display:none;place-items:center;padding:18px;z-index:50}
+  .modal.on{display:grid}
+  .modal .card{max-width:460px;width:100%}
+  .modal h2{margin:0 0 6px;font-size:18px}
+  .x{position:absolute;top:14px;right:16px;color:var(--muted);cursor:pointer;font-size:20px}
+  .modal .card{position:relative}
+
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+    color:#ffd9a0;background:rgba(255,160,80,.12);border:1px solid rgba(255,160,80,.3);
+    padding:3px 9px;border-radius:999px}
+  .hide{display:none !important}
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div class="brand">
+      <div class="logo">🎭</div>
+      <div>
+        <h1>Ensaio</h1>
+        <p>Treine a conversa difícil antes de ela acontecer.</p>
+      </div>
+    </div>
+    <button class="gear" id="gearBtn">⚙︎ Chave</button>
+  </header>
+
+  <!-- ============ SETUP ============ -->
+  <section id="setup">
+    <div class="card">
+      <span class="badge">Monte a cena</span>
+      <label>Com quem é essa conversa?</label>
+      <input type="text" id="who" placeholder="Ex.: minha gestora, a Ana">
+
+      <div class="row">
+        <div>
+          <label>Que tipo de relação?</label>
+          <select id="rel">
+            <option>Gestor(a) / liderança</option>
+            <option>Cliente</option>
+            <option>Colega de trabalho</option>
+            <option>Sócio(a)</option>
+            <option>Parceiro(a) / cônjuge</option>
+            <option>Familiar</option>
+            <option>Amigo(a)</option>
+            <option>Prestador / fornecedor</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Como essa pessoa costuma reagir? <span style="font-weight:400">(pode marcar mais de um)</span></label>
+      <div class="chips" id="traits">
+        <span class="chip" data-v="defensiva">Defensiva</span>
+        <span class="chip" data-v="explosiva">Explosiva</span>
+        <span class="chip" data-v="fria e distante">Fria / distante</span>
+        <span class="chip" data-v="passivo-agressiva">Passivo-agressiva</span>
+        <span class="chip" data-v="racional e fria">Racional</span>
+        <span class="chip" data-v="muito emotiva">Emotiva</span>
+        <span class="chip" data-v="manipuladora">Manipuladora</span>
+        <span class="chip" data-v="tranquila e aberta">Tranquila</span>
+      </div>
+
+      <label>O que você precisa dizer? Qual é o seu objetivo?</label>
+      <textarea id="goal" placeholder="Ex.: preciso pedir um aumento. Estou há 2 anos sem reajuste, assumi novas responsabilidades e quero 20% a mais."></textarea>
+
+      <label>Que tom você quer manter?</label>
+      <div class="chips" id="tones">
+        <span class="chip on" data-v="firme">Firme</span>
+        <span class="chip" data-v="empático">Empático</span>
+        <span class="chip" data-v="direto">Direto</span>
+        <span class="chip" data-v="diplomático">Diplomático</span>
+        <span class="chip" data-v="caloroso">Caloroso</span>
+      </div>
+
+      <div class="btns">
+        <button class="btn primary" id="startBtn">Começar o ensaio →</button>
+        <button class="btn ghost" id="suggestBtn">💡 Sugerir minha 1ª fala</button>
+      </div>
+
+      <div class="demoline">
+        <span>Sem chave de API? Veja a demonstração guiada (cena pronta de "pedir aumento").</span>
+        <button class="btn ghost" id="demoBtn">▶ Ver demonstração</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SIMULADOR ============ -->
+  <section id="sim" class="hide">
+    <div class="card">
+      <div class="scenebar">
+        <span class="who" id="simWho">Conversa</span>
+        <span class="tag" id="simRel"></span>
+        <span class="tag" id="demoTag" style="color:#ffd9a0">MODO DEMONSTRAÇÃO</span>
+      </div>
+
+      <div class="mood">
+        <span class="emoji" id="moodEmoji">😐</span>
+        <div class="meter"><i id="meterFill"></i></div>
+        <span class="moodlabel" id="moodLabel">Neutro</span>
+      </div>
+
+      <label class="toggle">
+        <input type="checkbox" id="thoughtToggle">
+        🧠 Revelar o que a outra pessoa está pensando
+      </label>
+
+      <div class="chat" id="chat"></div>
+
+      <div class="composer">
+        <textarea id="input" placeholder="Escreva o que você diria..."></textarea>
+        <button class="btn primary" id="sendBtn">Enviar</button>
+      </div>
+
+      <div class="tools">
+        <button class="btn ghost" id="coachBtn">🎯 Como fui?</button>
+        <button class="btn ghost" id="resetBtn">↺ Nova cena</button>
+      </div>
+
+      <div id="coachBox"></div>
+    </div>
+  </section>
+
+  <footer>
+    Ensaio · feito com IA para o Desafio TRAE + AI Brasil · sua chave fica só no seu navegador.
+  </footer>
+</div>
+
+<!-- ============ MODAL CHAVE ============ -->
+<div class="modal" id="keyModal">
+  <div class="card">
+    <span class="x" id="keyClose">✕</span>
+    <h2>Conectar o Claude</h2>
+    <p class="hint">O Ensaio usa a API da Anthropic (Claude). Sua chave fica salva <b>apenas neste navegador</b> (sessionStorage) e vai direto do seu navegador para a Anthropic — nunca passa por nenhum servidor nosso.</p>
+    <label>Chave de API da Anthropic</label>
+    <input type="text" id="apiKey" placeholder="sk-ant-...">
+    <label>Modelo</label>
+    <input type="text" id="model" value="claude-sonnet-4-6">
+    <div class="btns">
+      <button class="btn primary" id="keySave">Salvar</button>
+    </div>
+    <p class="hint">Pegue sua chave em <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a> → API Keys. Se o modelo der erro, confira o nome exato no seu console.</p>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Ensaio — simulador de conversas difíceis
+   Página única estática. Chama a API da Anthropic direto do
+   navegador (BYOK). Modo demonstração funciona sem chave.
+   ============================================================ */
+
+const $ = id => document.getElementById(id);
+const API_URL = "https://api.anthropic.com/v1/messages";
+
+let state = {
+  who:"", rel:"", traits:[], goal:"", tone:"firme",
+  mood:50, history:[], demo:false, demoStep:0
+};
+
+/* ---------- chips ---------- */
+document.querySelectorAll("#traits .chip").forEach(c=>{
+  c.onclick = ()=> c.classList.toggle("on");
+});
+document.querySelectorAll("#tones .chip").forEach(c=>{
+  c.onclick = ()=>{
+    document.querySelectorAll("#tones .chip").forEach(x=>x.classList.remove("on"));
+    c.classList.add("on");
+  };
+});
+
+/* ---------- chave / modal ---------- */
+function getKey(){ return sessionStorage.getItem("ensaio_key") || ""; }
+function getModel(){ return sessionStorage.getItem("ensaio_model") || "claude-sonnet-4-6"; }
+$("gearBtn").onclick = ()=>{
+  $("apiKey").value = getKey();
+  $("model").value = getModel();
+  $("keyModal").classList.add("on");
+};
+$("keyClose").onclick = ()=> $("keyModal").classList.remove("on");
+$("keySave").onclick = ()=>{
+  sessionStorage.setItem("ensaio_key", $("apiKey").value.trim());
+  sessionStorage.setItem("ensaio_model", $("model").value.trim() || "claude-sonnet-4-6");
+  $("keyModal").classList.remove("on");
+};
+
+/* ---------- coleta do setup ---------- */
+function readSetup(){
+  state.who = $("who").value.trim() || "a outra pessoa";
+  state.rel = $("rel").value;
+  state.traits = [...document.querySelectorAll("#traits .chip.on")].map(c=>c.dataset.v);
+  state.goal = $("goal").value.trim();
+  state.tone = (document.querySelector("#tones .chip.on")||{dataset:{v:"firme"}}).dataset.v;
+}
+
+/* ---------- chamada à API ---------- */
+async function callClaude(system, messages, maxTokens=700){
+  const key = getKey();
+  if(!key){ throw new Error("NO_KEY"); }
+  const res = await fetch(API_URL, {
+    method:"POST",
+    headers:{
+      "content-type":"application/json",
+      "x-api-key":key,
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-access":"true"
+    },
+    body: JSON.stringify({
+      model:getModel(), max_tokens:maxTokens, system, messages
+    })
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error("API "+res.status+": "+t);
+  }
+  const data = await res.json();
+  return (data.content && data.content[0] && data.content[0].text) || "";
+}
+
+/* extrai o primeiro objeto JSON de um texto */
+function parseJSON(txt){
+  try{ return JSON.parse(txt); }catch(e){}
+  let s = txt.replace(/```json/gi,"").replace(/```/g,"");
+  const a = s.indexOf("{"), b = s.lastIndexOf("}");
+  if(a>=0 && b>a){ try{ return JSON.parse(s.slice(a,b+1)); }catch(e){} }
+  return null;
+}
+
+/* ---------- prompts ---------- */
+function personaSystem(){
+  const traits = state.traits.length ? state.traits.join(", ") : "reações realistas e variadas";
+  return `Você está num SIMULADOR DE CONVERSAS DIFÍCEIS. Seu papel é INTERPRETAR uma pessoa real numa conversa, para que o usuário possa treinar antes de tê-la na vida real.
+
+QUEM VOCÊ INTERPRETA: ${state.who} (${state.rel}).
+PERSONALIDADE / COMO ESSA PESSOA REAGE: ${traits}.
+CONTEXTO (o que o usuário quer tratar): ${state.goal || "uma conversa delicada"}.
+
+REGRAS:
+- Você É essa pessoa. Nunca quebre o personagem. Nunca diga que é uma IA.
+- Responda em português do Brasil, de forma curta e natural, como gente fala numa conversa real (1 a 4 frases). Nada de textão.
+- Reaja de verdade ao que o usuário diz: se ele for desajeitado, agressivo ou inseguro, mostre isso (irritação, mágoa, defesa). Se ele for claro, empático e firme, deixe a pessoa abrir mais. Seja realista, não fácil demais.
+- Mantenha coerência com a personalidade definida.
+
+FORMATO DA RESPOSTA — responda SOMENTE com um JSON válido, sem texto fora dele:
+{
+  "fala": "o que a pessoa diz em voz alta",
+  "humor": número de 0 a 100 (0 = furiosa/fechada, 50 = neutra, 100 = aberta/convencida) representando como ela está se sentindo AGORA depois desta fala do usuário,
+  "pensamento": "o que essa pessoa está realmente pensando por dentro, mas não diz"
+}`;
+}
+
+function coachSystem(){
+  return `Você é um COACH de comunicação observando uma simulação de conversa difícil entre o usuário e "${state.who}".
+O objetivo do usuário: ${state.goal || "conduzir bem uma conversa delicada"}. Tom desejado: ${state.tone}.
+
+Analise a ÚLTIMA fala do usuário no contexto da conversa. Seja específico, prático e gentil, mas honesto.
+
+Responda SOMENTE com JSON válido:
+{
+  "analise": "2 a 3 frases: o que funcionou e o principal risco/erro da última fala do usuário",
+  "sugestao": "uma frase pronta, melhor, que o usuário poderia dizer agora"
+}`;
+}
+
+/* ---------- render ---------- */
+function addBubble(text, cls){
+  const d = document.createElement("div");
+  d.className = "msg "+cls;
+  d.textContent = text;
+  $("chat").appendChild(d);
+  scrollChat();
+  return d;
+}
+function addThought(text){
+  const d = document.createElement("div");
+  d.className = "think";
+  d.innerHTML = "<b>💭 pensando:</b> ";
+  d.appendChild(document.createTextNode(text));
+  if(!$("thoughtToggle").checked) d.classList.add("hide");
+  d.dataset.think = "1";
+  $("chat").appendChild(d);
+  scrollChat();
+}
+function scrollChat(){ const c=$("chat"); c.scrollTop = c.scrollHeight; }
+
+function setMood(v){
+  state.mood = Math.max(0, Math.min(100, v));
+  $("meterFill").style.width = state.mood + "%";
+  let e="😐", l="Neutro";
+  if(state.mood<20){e="😡";l="Furiosa";}
+  else if(state.mood<40){e="😒";l="Irritada";}
+  else if(state.mood<60){e="😐";l="Neutra";}
+  else if(state.mood<80){e="🙂";l="Abrindo";}
+  else {e="😄";l="Convencida";}
+  $("moodEmoji").textContent = e;
+  $("moodLabel").textContent = l;
+}
+
+$("thoughtToggle").onchange = ()=>{
+  document.querySelectorAll(".think").forEach(t=>{
+    t.classList.toggle("hide", !$("thoughtToggle").checked);
+  });
+};
+
+/* ---------- iniciar ---------- */
+function openSim(){
+  $("setup").classList.add("hide");
+  $("sim").classList.remove("hide");
+  $("simWho").textContent = state.who;
+  $("simRel").textContent = state.rel;
+  $("demoTag").classList.toggle("hide", !state.demo);
+  $("chat").innerHTML = "";
+  $("coachBox").innerHTML = "";
+  setMood(50);
+}
+
+$("startBtn").onclick = ()=>{
+  readSetup();
+  if(!getKey()){
+    alert("Para o ensaio ao vivo você precisa conectar sua chave do Claude (botão ⚙︎ Chave no topo). Ou clique em \"Ver demonstração\" para experimentar sem chave.");
+    $("gearBtn").click();
+    return;
+  }
+  state.demo=false; state.history=[];
+  openSim();
+  addBubble("Tudo pronto. Mande sua primeira fala para "+state.who+" — eu reajo como ela reagiria.", "them");
+};
+
+$("suggestBtn").onclick = async ()=>{
+  readSetup();
+  if(!getKey()){ alert("Conecte sua chave do Claude (⚙︎ Chave) para gerar sugestões."); $("gearBtn").click(); return; }
+  $("suggestBtn").disabled=true; $("suggestBtn").textContent="Gerando...";
+  try{
+    const sys = `Você ajuda alguém a abrir uma conversa difícil com ${state.who} (${state.rel}). Objetivo: ${state.goal}. Tom desejado: ${state.tone}. Escreva APENAS a primeira fala que a pessoa poderia dizer para começar bem — 1 a 3 frases, em português do Brasil, sem aspas, sem explicação.`;
+    const out = await callClaude(sys, [{role:"user",content:"Escreva a primeira fala."}], 250);
+    $("input") && ( $("goal").value = $("goal").value );
+    if(!$("sim").classList.contains("hide")){ $("input").value = out.trim(); }
+    else { alert("Sugestão de abertura:\n\n"+out.trim()+"\n\n(Clique em Começar o ensaio para usá-la.)"); window._suggestion = out.trim(); }
+  }catch(e){ alert("Erro ao gerar: "+e.message); }
+  $("suggestBtn").disabled=false; $("suggestBtn").textContent="💡 Sugerir minha 1ª fala";
+};
+
+/* ---------- enviar ---------- */
+$("sendBtn").onclick = send;
+$("input").addEventListener("keydown", e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); }
+});
+
+async function send(){
+  const text = $("input").value.trim();
+  if(!text) return;
+  addBubble(text, "me");
+  $("input").value="";
+
+  if(state.demo){ return demoReply(); }
+
+  state.history.push({role:"user", content:text});
+  const typing = document.createElement("div");
+  typing.className="typing"; typing.textContent = state.who+" está digitando…";
+  $("chat").appendChild(typing); scrollChat();
+  $("sendBtn").disabled=true;
+  try{
+    const raw = await callClaude(personaSystem(), state.history, 600);
+    typing.remove();
+    const j = parseJSON(raw) || {fala:raw, humor:state.mood, pensamento:""};
+    addBubble(j.fala || "...", "them");
+    if(j.pensamento) addThought(j.pensamento);
+    if(typeof j.humor === "number") setMood(j.humor);
+    state.history.push({role:"assistant", content:raw});
+  }catch(e){
+    typing.remove();
+    if(e.message==="NO_KEY"){ alert("Conecte sua chave do Claude (⚙︎ Chave)."); $("gearBtn").click(); }
+    else addBubble("[erro: "+e.message+"]", "them");
+  }
+  $("sendBtn").disabled=false;
+}
+
+/* ---------- coach ---------- */
+$("coachBtn").onclick = async ()=>{
+  if(state.demo){ return demoCoach(); }
+  if(!state.history.length){ alert("Mande pelo menos uma fala antes de pedir feedback."); return; }
+  $("coachBtn").disabled=true; $("coachBtn").textContent="Analisando...";
+  const transcript = state.history.map(m=> (m.role==="user"?"VOCÊ: ":"OUTRO: ")+ (typeof m.content==="string"?m.content:"")).join("\n");
+  try{
+    const raw = await callClaude(coachSystem(), [{role:"user", content:"Conversa até agora:\n"+transcript}], 500);
+    const j = parseJSON(raw) || {analise:raw, sugestao:""};
+    renderCoach(j);
+  }catch(e){ alert("Erro: "+e.message); }
+  $("coachBtn").disabled=false; $("coachBtn").textContent="🎯 Como fui?";
+};
+
+function renderCoach(j){
+  const box = $("coachBox");
+  box.innerHTML = `<div class="coach">
+    <h3>🎯 Feedback do coach</h3>
+    <p>${escapeHtml(j.analise||"")}</p>
+    ${j.sugestao?`<div class="sug"><b>Tente assim:</b> "${escapeHtml(j.sugestao)}" <button class="btn ghost" id="useSug" style="margin-left:8px;padding:6px 10px;font-size:12.5px">Usar</button></div>`:""}
+  </div>`;
+  if(j.sugestao){ $("useSug").onclick = ()=>{ $("input").value = j.sugestao; $("input").focus(); }; }
+  box.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+function escapeHtml(s){ return (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+/* ---------- reset ---------- */
+$("resetBtn").onclick = ()=>{
+  state.history=[]; state.demo=false; state.demoStep=0;
+  $("sim").classList.add("hide"); $("setup").classList.remove("hide");
+};
+
+/* ============================================================
+   MODO DEMONSTRAÇÃO — roda sem chave de API.
+   Cena: pedir aumento ao chefe (Ricardo), que é defensivo.
+   ============================================================ */
+const DEMO = {
+  who:"Ricardo (seu gestor)", rel:"Gestor(a) / liderança",
+  opening:"Oi! Pode falar. Mas já adianto que o orçamento desse trimestre tá bem apertado, viu?",
+  openMood:45, openThink:"Lá vem... espero que não seja pedido de aumento de novo.",
+  suggestions:[
+    "Ricardo, queria 15 minutos seu pra falar do meu crescimento aqui. Topa?",
+    "Faz dois anos sem reajuste e eu assumi a coordenação de dois projetos. Acho justo revermos meu salário.",
+    "Entendo o orçamento. Posso te trazer um resumo do impacto que gerei pra gente conversar com números na próxima semana?"
+  ],
+  turns:[
+    {fala:"Crescimento? Você tá indo bem, mas todo mundo aqui tá puxando o carro. Não sei se é o momento.",
+     humor:38, pensamento:"Não quero perder essa pessoa, mas se eu abrir pra um, abro pra todos."},
+    {fala:"Dois projetos é verdade... eu reconheço. Mas reajuste agora, com esse orçamento, é complicado de aprovar lá em cima.",
+     humor:55, pensamento:"Ela tem razão na real. O problema sou eu que vou ter que brigar com o financeiro."},
+    {fala:"Sabe que assim fica difícil eu dizer não? Me manda esse resumo que eu levo pessoalmente pro diretor na quinta.",
+     humor:78, pensamento:"Gostei. Veio com dado, sem drama. Assim eu consigo defender lá em cima."}
+  ],
+  coach:{
+    analise:"Você ancorou no valor que entrega (dois projetos, coordenação) em vez de pedir por tempo de casa — isso é forte. O risco era soar exigente; você equilibrou reconhecendo o orçamento dele.",
+    sugestao:"Perfeito. Eu te mando o resumo até quarta com os números dos dois projetos. Obrigada por levar pessoalmente."
+  }
+};
+
+$("demoBtn").onclick = ()=>{
+  state = {who:DEMO.who, rel:DEMO.rel, traits:["defensiva"], goal:"pedir um aumento para o gestor", tone:"firme",
+           mood:DEMO.openMood, history:[], demo:true, demoStep:0};
+  openSim();
+  addBubble(DEMO.opening, "them");
+  addThought(DEMO.openThink);
+  setMood(DEMO.openMood);
+  $("input").value = DEMO.suggestions[0];
+  addBubble("👋 Modo demonstração: as respostas já estão roteirizadas. É só clicar em Enviar (a fala sugerida já está no campo) e ver o humor do Ricardo mudar.", "them");
+};
+
+function demoReply(){
+  const t = DEMO.turns[state.demoStep];
+  if(!t){
+    addBubble("Fim da demonstração 🎬 Conecte sua chave (⚙︎) para ensaiar a SUA conversa de verdade.", "them");
+    return;
+  }
+  const typing = document.createElement("div");
+  typing.className="typing"; typing.textContent = state.who+" está digitando…";
+  $("chat").appendChild(typing); scrollChat();
+  setTimeout(()=>{
+    typing.remove();
+    addBubble(t.fala, "them");
+    addThought(t.pensamento);
+    setMood(t.humor);
+    state.demoStep++;
+    const next = DEMO.suggestions[state.demoStep];
+    if(next) $("input").value = next;
+  }, 700);
+}
+function demoCoach(){ renderCoach(DEMO.coach); }
+</script>
+</body>
+</html>
