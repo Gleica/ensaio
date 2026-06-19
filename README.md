@@ -2,7 +2,7 @@
 
 > Um simulador de IA onde você ensaia aquela conversa que dá frio na barriga — pedir aumento, cobrar um cliente, dar uma notícia ruim, terminar um contrato — **conversando com a outra pessoa antes de ela existir de verdade**.
 
-**Aplicação no ar:** _[https://gleica.github.io/ensaio/)_
+**Aplicação no ar:** [https://gleica.github.io/ensaio/](https://gleica.github.io/ensaio/)
 **Vídeo de apresentação:** _(cole aqui o link do Loom/YouTube)_
 
 ---
@@ -21,62 +21,74 @@ E o diferencial: enquanto você conversa, você vê duas coisas que na vida real
 
 - 🌡️ **O termômetro de humor** da outra pessoa subindo ou descendo a cada fala sua.
 - 🧠 **O que ela está realmente pensando** por dentro — o pensamento que ela nunca diria em voz alta.
+- 📈 **O arco emocional** da conversa inteira em gráfico, ao vivo.
 
-No fim (ou a qualquer momento), o botão **"Como fui?"** chama um coach de comunicação que aponta o que funcionou, onde você cedeu demais ou foi agressivo, e sugere a próxima fala.
+No fim, o botão **"📋 Relatório final"** gera um relatório completo: nota (0–10), pontos fortes, erros recorrentes, sua melhor fala e um próximo passo concreto. O botão **"🎯 Como fui?"** dá feedback imediato a qualquer momento.
 
 ## O diferencial
 
 A maioria dos assistentes de IA te dá *a resposta certa*. O Ensaio te dá **o treino** — e o feedback que mostra o invisível de uma conversa real: a emoção e o pensamento do outro lado. É um simulador de voo para conversas humanas.
 
-## Como funciona (em 3 passos)
+## Como funciona (em 4 passos)
 
-1. **Monte a cena** — quem é a pessoa, a relação, como ela costuma reagir, o que você precisa dizer e que tom quer manter.
-2. **Ensaie** — converse no chat. A IA responde no personagem, o termômetro de humor se move e você pode revelar o pensamento dela.
-3. **Receba feedback** — clique em "Como fui?" e ajuste sua abordagem. Repita até ganhar confiança.
+1. **Escolha uma cena** — use um atalho pronto (pedir aumento, dar feedback, cobrar dívida, encerrar parceria...) ou monte a sua do zero.
+2. **Configure a dificuldade** — 😌 Fácil (persona receptiva), 😐 Normal (realista) ou 🔥 Pesadelo (adversarial, pressiona e não cede fácil).
+3. **Ensaie** — converse no chat. A IA responde em streaming no personagem, o termômetro de humor se move em tempo real e você pode revelar o pensamento dela.
+4. **Receba feedback** — use "🎯 Como fui?" para feedback imediato ou "📋 Relatório final" para análise completa da sessão. Repita até ganhar confiança.
 
 > 💡 Tem um **modo demonstração** que roda sem nenhuma chave de API (cena pronta: "pedir aumento ao gestor"), para experimentar na hora.
 
+## Funcionalidades
+
+| Funcionalidade | Detalhe |
+|---|---|
+| 🎭 Persona IA em streaming | Resposta em tempo real com indicador de digitação |
+| 🌡️ Termômetro de humor | 0–100, atualizado a cada resposta da persona |
+| 🧠 Pensamento oculto | O que a outra pessoa pensa mas não diz |
+| 📈 Arco emocional | Gráfico SVG ao vivo com a evolução do humor |
+| 📚 Biblioteca de cenas | 6 cenas prontas (aumento, feedback, dívida, contrato, prazo, demissão) |
+| 🎚️ Dificuldade | Fácil / Normal / Pesadelo — altera o comportamento da persona no prompt |
+| 🎯 Coach em tempo real | Análise da última fala + sugestão de reformulação |
+| 📋 Relatório final | Nota, pontos fortes, erros, melhor fala, próximo passo |
+| 💡 Sugestão de abertura | IA sugere a primeira fala para você começar |
+| ▶ Modo demonstração | Conversa roteirizada, sem chave de API |
+
 ## Tecnologias utilizadas
 
-- **HTML, CSS e JavaScript puro** (vanilla) — uma única página, zero dependências, zero build.
-- **API da Anthropic (Claude)** — chamada direto do navegador com o cabeçalho `anthropic-dangerous-direct-browser-access`, no padrão *traga sua própria chave* (BYOK). A chave fica só no `sessionStorage` do usuário e nunca passa por nenhum servidor intermediário.
-- **GitHub Pages** — hospedagem estática.
+- **HTML, CSS e JavaScript puro** (vanilla) — zero dependências, zero build step.
+- **API da Anthropic (Claude Sonnet)** — chamadas direto do navegador com o cabeçalho `anthropic-dangerous-direct-browser-access`. Modo BYOK: chave fica só no `sessionStorage` do usuário. Modo compartilhado: chave injetada via GitHub Actions secret, nunca exposta no repositório.
+- **GitHub Pages + GitHub Actions** — hospedagem estática com deploy automatizado e injeção segura de secrets.
 - Desenvolvido com o apoio da **TRAE** durante o Desafio TRAE + AI Brasil.
 
 ## Como executar localmente
 
-Por ser um único arquivo estático, basta abrir o `index.html` no navegador. Para evitar qualquer bloqueio de CORS do navegador, o recomendado é servir localmente:
-
 ```bash
 # dentro da pasta do projeto
-python3 -m http.server 8000
-# abra http://localhost:8000
+python3 -m http.server 9000
+# abra http://localhost:9000
 ```
+
+Abrir `index.html` diretamente no browser também funciona, mas um servidor local evita bloqueios de CORS.
 
 ## Como usar
 
 1. Abra a aplicação.
 2. Clique em **▶ Ver demonstração** para conhecer o fluxo sem precisar de chave, **ou**
-3. Clique em **⚙︎ Chave** (topo), cole sua chave da Anthropic e salve para ensaiar a sua conversa de verdade.
-4. Preencha a cena e clique em **Começar o ensaio**.
-5. Converse, observe o humor e o pensamento da outra pessoa, e use **🎯 Como fui?** para receber feedback.
+3. Clique em **⚙︎ Chave** (topo), cole sua chave da Anthropic e salve.
+4. Escolha uma cena da biblioteca ou preencha os campos manualmente.
+5. Selecione a dificuldade e clique em **Começar o ensaio**.
+6. Converse, observe o humor e o pensamento da outra pessoa.
+7. Use **🎯 Como fui?** para feedback imediato ou **📋 Relatório final** ao encerrar.
 
 ### Como conseguir uma chave da Anthropic
 
-Acesse [console.anthropic.com](https://console.anthropic.com/) → **API Keys** → **Create Key**. A chave começa com `sk-ant-`. Cole no botão ⚙︎ Chave do app. Se o modelo padrão der erro, confira o nome exato do modelo disponível na sua conta e troque no mesmo campo.
+Acesse [console.anthropic.com](https://console.anthropic.com/) → **API Keys** → **Create Key**. A chave começa com `sk-ant-`. Cole no botão ⚙︎ Chave do app.
 
 ## Privacidade
 
-A chave de API fica **apenas no navegador do usuário** (`sessionStorage`, apagada ao fechar a aba) e vai direto do navegador para a Anthropic. Nada é enviado, salvo ou registrado por nenhum servidor deste projeto — não há backend.
+No **modo BYOK**, a chave fica apenas no `sessionStorage` do seu navegador (apagada ao fechar a aba) e vai direto do navegador para a Anthropic — nenhum servidor intermediário.
 
-## Possíveis melhorias futuras
-
-- Modo **voz**: ensaiar falando, com transcrição e resposta em áudio.
-- **Biblioteca de cenas** prontas (demissão, feedback, negociação salarial, conflito familiar).
-- **Relatório pós-ensaio** com evolução do humor ao longo da conversa em gráfico.
-- **Níveis de dificuldade** da persona (do "tranquilo" ao "modo pesadelo").
-- Backend opcional com chave compartilhada, para uso sem BYOK.
-- Suporte a **múltiplos modelos** (OpenAI, Gemini) com seleção na interface.
+No **modo compartilhado** (evento), a chave é injetada pelo GitHub Actions no momento do deploy e nunca aparece no código-fonte do repositório.
 
 ## Licença
 
