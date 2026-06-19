@@ -53,6 +53,8 @@ document.querySelectorAll("#traits .chip").forEach(c => {
 });
 
 /* ---------- chave / modal ---------- */
+if(isSharedMode()) $("gearBtn").classList.add("hide");
+
 $("gearBtn").onclick = () => {
   $("apiKey").value = getKey();
   $("model").value = getModel();
