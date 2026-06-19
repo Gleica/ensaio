@@ -66,6 +66,7 @@ textarea { resize: vertical; min-height: 70px }
 
 /* ── Simulator ──────────────────────────── */
 .scenebar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px }
+.scene-back { margin-left: auto; font-size: 13px; padding: 6px 12px; color: var(--txt) !important; border-color: var(--muted) !important; flex-shrink: 0 }
 .who { font-weight: 700 }
 .tag { font-size: 12px; color: var(--muted); background: var(--bg2); border: 1px solid var(--line); padding: 3px 9px; border-radius: 999px }
 .mood { display: flex; align-items: center; gap: 10px; margin: 8px 0 20px }
