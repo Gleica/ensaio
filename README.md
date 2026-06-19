@@ -3,7 +3,6 @@
 > Um simulador de IA onde você ensaia aquela conversa que dá frio na barriga — pedir aumento, cobrar um cliente, dar uma notícia ruim, terminar um contrato — **conversando com a outra pessoa antes de ela existir de verdade**.
 
 **Aplicação no ar:** [https://gleica.github.io/ensaio/](https://gleica.github.io/ensaio/)
-**Vídeo de apresentação:** _(cole aqui o link do Loom/YouTube)_
 
 ---
 
@@ -89,6 +88,19 @@ Acesse [console.anthropic.com](https://console.anthropic.com/) → **API Keys** 
 No **modo BYOK**, a chave fica apenas no `sessionStorage` do seu navegador (apagada ao fechar a aba) e vai direto do navegador para a Anthropic — nenhum servidor intermediário.
 
 No **modo compartilhado** (evento), a chave é injetada pelo GitHub Actions no momento do deploy e nunca aparece no código-fonte do repositório.
+
+## Possíveis melhorias futuras
+
+| Melhoria | Descrição |
+|---|---|
+| 🎙️ Voz para a persona | Síntese de voz com a resposta da persona, tornando o ensaio mais imersivo |
+| 🗂️ Histórico de ensaios | Salvar sessões anteriores no `localStorage` para revisitar e comparar evolução |
+| 👥 Modo multiplayer | Duas pessoas ensaiam a mesma conversa em papéis opostos, com IA como mediadora |
+| 🌍 Suporte a outros idiomas | Interface e prompts em inglês e espanhol para ampliar o alcance |
+| 📊 Dashboard de progresso | Painel com estatísticas ao longo das sessões: média de nota, humor médio, cenas mais ensaiadas |
+| 🔁 Modo variação | IA gera uma versão alternativa da mesma conversa com outra estratégia de comunicação, para comparar abordagens |
+| 🏷️ Perfis de persona salvos | Salvar personas personalizadas (ex.: "meu gestor direto") para reusar em múltiplos ensaios |
+| 📱 App nativo (PWA) | Transformar em Progressive Web App instalável com notificações de lembrete de ensaio |
 
 ## Licença
 
