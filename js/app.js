@@ -264,3 +264,34 @@ function demoReply(){
 }
 
 function demoCoach(){ renderCoach(DEMO.coach); }
+
+/* ---------- biblioteca de cenas ---------- */
+function loadScene(scene){
+  $("who").value = scene.who;
+  [...$("rel").options].forEach(o => { o.selected = o.text === scene.rel; });
+  document.querySelectorAll("#traits .chip").forEach(c => {
+    c.classList.toggle("on", scene.traits.includes(c.dataset.v));
+  });
+  $("goal").value = scene.goal;
+  document.querySelectorAll("#tones .chip").forEach(c => {
+    c.classList.toggle("on", c.dataset.v === scene.tone);
+  });
+  document.querySelectorAll(".scene-card").forEach(c => {
+    c.classList.toggle("on", c.dataset.id === scene.id);
+  });
+  $("who").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function renderSceneGallery(){
+  const gallery = $("scenesGallery");
+  SCENES.forEach(s => {
+    const card = document.createElement("div");
+    card.className = "scene-card";
+    card.dataset.id = s.id;
+    card.innerHTML = `<div class="scene-emoji">${s.emoji}</div><div class="scene-title">${s.title}</div><div class="scene-sub">${s.subtitle}</div>`;
+    card.onclick = () => loadScene(s);
+    gallery.appendChild(card);
+  });
+}
+
+renderSceneGallery();

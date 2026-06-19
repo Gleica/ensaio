@@ -110,6 +110,20 @@
     padding:3px 9px;border-radius:999px}
   .hide{display:none !important}
   footer{margin-top:26px;text-align:center;color:var(--muted);font-size:12px}
+
+  /* Biblioteca de cenas */
+  .scenes-hint{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin:14px 0 8px}
+  .scenes-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .scenes-row::-webkit-scrollbar{height:4px}
+  .scenes-row::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  .scene-card{flex:0 0 142px;background:var(--bg2);border:1.5px solid var(--line);border-radius:14px;
+    padding:11px 13px;cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none}
+  .scene-card:hover{border-color:var(--accent2)}
+  .scene-card.on{border-color:var(--accent2);background:rgba(91,108,255,.09);box-shadow:0 0 0 3px rgba(91,108,255,.14)}
+  .scene-emoji{font-size:20px;margin-bottom:6px}
+  .scene-title{font-size:13px;font-weight:700;margin-bottom:3px}
+  .scene-sub{font-size:11px;color:var(--muted);line-height:1.35}
+  .scenes-sep{margin:16px 0 0;border:none;border-top:1px dashed var(--line)}
 </style>
 </head>
 <body>
@@ -129,6 +143,9 @@
   <section id="setup">
     <div class="card">
       <span class="badge">Monte a cena</span>
+      <p class="scenes-hint">Atalhos de cenas</p>
+      <div class="scenes-row" id="scenesGallery"></div>
+      <hr class="scenes-sep">
       <label>Com quem é essa conversa?</label>
       <input type="text" id="who" placeholder="Ex.: minha gestora, a Ana">
 
@@ -243,6 +260,7 @@
   </div>
 </div>
 
+<script src="js/scenes.js"></script>
 <script src="js/claude.js"></script>
 <script src="js/app.js"></script>
 
