@@ -25,7 +25,10 @@ export async function requestCoach(state) {
     const coachData = parseJSON(raw) || { analise: raw, sugestao: "" };
     renderCoach(coachData);
   } catch (e) {
-    alert("Erro ao gerar feedback. Tente novamente.");
+    const msg = e.message === "RATE_LIMITED"
+      ? "Limite diário atingido. Tente novamente amanhã ou use sua própria chave (⚙︎)."
+      : "Erro ao gerar feedback. Tente novamente.";
+    alert(msg);
     console.error(e);
   }
   $("coachBtn").disabled = false;
@@ -49,7 +52,10 @@ export async function generateReport(state) {
     if (report) renderReport(report);
     else $("reportContent").innerHTML = `<p style="white-space:pre-wrap;font-size:14px">${escapeHtml(raw)}</p>`;
   } catch (e) {
-    $("reportContent").innerHTML = `<p style="color:var(--bad)">Erro ao gerar relatório. Tente novamente.</p>`;
+    const msg = e.message === "RATE_LIMITED"
+      ? "Limite diário atingido. Tente novamente amanhã ou use sua própria chave (⚙︎)."
+      : "Erro ao gerar relatório. Tente novamente.";
+    $("reportContent").innerHTML = `<p style="color:var(--bad)">${msg}</p>`;
     console.error(e);
   }
 }

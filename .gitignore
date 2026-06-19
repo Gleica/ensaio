@@ -1,4 +1,5 @@
 node_modules/
+worker/node_modules/
 test-results/
 tests/screenshots/
 playwright-report/

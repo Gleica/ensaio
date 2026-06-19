@@ -1,43 +1,56 @@
-import { API_URL } from "../config.js";
+import { API_URL, PROXY_URL } from "../config.js";
 
-export async function callClaude(key, model, system, messages, maxTokens = 700) {
-  if (!key) throw new Error("NO_KEY");
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: {
+function endpoint(key) {
+  // Sem chave do usuário → proxy server-side (chave nunca chega ao browser).
+  // Com chave do usuário → direto para Anthropic (BYOK).
+  return key ? API_URL : PROXY_URL;
+}
+
+function buildHeaders(key) {
+  if (key) {
+    return {
       "content-type": "application/json",
       "x-api-key": key,
       "anthropic-version": "2023-06-01",
       "anthropic-dangerous-direct-browser-access": "true",
-    },
+    };
+  }
+  return {
+    "content-type": "application/json",
+    "anthropic-version": "2023-06-01",
+  };
+}
+
+function throwApiError(status) {
+  console.error("Anthropic API error: status", status);
+  if (status === 429) throw new Error("RATE_LIMITED");
+  throw new Error(`Erro na API (${status}). Verifique sua chave.`);
+}
+
+function proxyReady() {
+  return !!PROXY_URL && !PROXY_URL.startsWith("__");
+}
+
+export async function callClaude(key, model, system, messages, maxTokens = 700) {
+  if (!key && !proxyReady()) throw new Error("NO_KEY");
+  const res = await fetch(endpoint(key), {
+    method: "POST",
+    headers: buildHeaders(key),
     body: JSON.stringify({ model, max_tokens: maxTokens, system, messages }),
   });
-  if (!res.ok) {
-    const detail = await res.text();
-    console.error("Anthropic API error:", detail);
-    throw new Error(`Erro na API (${res.status}). Verifique sua chave.`);
-  }
+  if (!res.ok) throwApiError(res.status);
   const data = await res.json();
   return data.content?.[0]?.text || "";
 }
 
 export async function callClaudeStream(key, model, system, messages, maxTokens, onChunk) {
-  if (!key) throw new Error("NO_KEY");
-  const res = await fetch(API_URL, {
+  if (!key && !proxyReady()) throw new Error("NO_KEY");
+  const res = await fetch(endpoint(key), {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": key,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
+    headers: buildHeaders(key),
     body: JSON.stringify({ model, max_tokens: maxTokens, system, messages, stream: true }),
   });
-  if (!res.ok) {
-    const detail = await res.text();
-    console.error("Anthropic API error:", detail);
-    throw new Error(`Erro na API (${res.status}). Verifique sua chave.`);
-  }
+  if (!res.ok) throwApiError(res.status);
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let accumulated = "";

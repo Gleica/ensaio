@@ -24,10 +24,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Inject shared API key
-        env:
-          ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_KEY }}
-        run: sed -i "s|__SHARED_KEY__|${ANTHROPIC_KEY}|g" js/session.js
+      - name: Inject proxy URL
+        run: sed -i "s|__PROXY_URL__|${{ secrets.PROXY_URL }}|g" js/config.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

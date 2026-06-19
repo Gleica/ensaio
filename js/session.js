@@ -1,19 +1,17 @@
-import { MODEL_DEFAULT, STORAGE_KEYS } from "./config.js";
+import { MODEL_DEFAULT, STORAGE_KEYS, PROXY_URL } from "./config.js";
 
-// Placeholder replaced at deploy time by GitHub Actions (see .github/workflows/deploy.yml).
-// Locally this stays as "__SHARED_KEY__" so isSharedMode() returns false and BYOK is used.
-const SHARED_KEY = "__SHARED_KEY__";
-
+// Modo compartilhado: proxy disponível (PROXY_URL injetado) E usuário sem chave própria.
+// Localmente PROXY_URL = "__PROXY_URL__" → isSharedMode() = false → gear button visível.
 export function isSharedMode() {
-  return !!SHARED_KEY && !SHARED_KEY.startsWith("__");
+  const proxyReady = !!PROXY_URL && !PROXY_URL.startsWith("__");
+  const userHasKey = !!sessionStorage.getItem(STORAGE_KEYS.apiKey);
+  return proxyReady && !userHasKey;
 }
 
 export function getKey() {
-  return isSharedMode() ? SHARED_KEY : (sessionStorage.getItem(STORAGE_KEYS.apiKey) || "");
+  return sessionStorage.getItem(STORAGE_KEYS.apiKey) || "";
 }
 
 export function getModel() {
-  return isSharedMode()
-    ? MODEL_DEFAULT
-    : (sessionStorage.getItem(STORAGE_KEYS.model) || MODEL_DEFAULT);
+  return sessionStorage.getItem(STORAGE_KEYS.model) || MODEL_DEFAULT;
 }
