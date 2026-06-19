@@ -1,6 +1,6 @@
 import { getKey, getModel } from "../session.js";
 import { MAX_TOKENS } from "../config.js";
-import { callClaude } from "../api/anthropic.js";
+import { callClaude, callClaudeStream } from "../api/anthropic.js";
 import { coachSystem, reportSystem } from "../prompts.js";
 import { parseJSON } from "../lib/parse.js";
 import { buildTranscript } from "../lib/transcript.js";
@@ -35,23 +35,42 @@ export async function requestCoach(state) {
   $("coachBtn").textContent = "🎯 Como fui?";
 }
 
+const REPORT_STEPS = [
+  "🔍 Lendo a conversa…",
+  "📊 Avaliando suas falas…",
+  "✍️ Calculando sua nota…",
+  "📋 Escrevendo o relatório…",
+];
+
 export async function generateReport(state) {
   const userTurns = state.history.filter(m => m.role === "user").length;
   if (userTurns < 2) { alert("Troque pelo menos 2 falas antes de gerar o relatório."); return; }
-  $("reportContent").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted)">⏳ Analisando sua conversa…</div>`;
+
+  $("reportContent").innerHTML = `<div class="report-loading"><span id="reportStep">${REPORT_STEPS[0]}</span></div>`;
   $("reportModal").classList.add("on");
+
+  let stepIdx = 0;
+  const stepTimer = setInterval(() => {
+    stepIdx = Math.min(stepIdx + 1, REPORT_STEPS.length - 1);
+    const el = document.getElementById("reportStep");
+    if (el) el.textContent = REPORT_STEPS[stepIdx];
+  }, 1500);
+
   const transcript = buildTranscript(state.history);
   try {
-    const raw = await callClaude(
+    const raw = await callClaudeStream(
       getKey(), getModel(),
       reportSystem(state),
       [{ role: "user", content: "Transcrição:\n" + transcript }],
-      MAX_TOKENS.report
+      MAX_TOKENS.report,
+      () => {}
     );
+    clearInterval(stepTimer);
     const report = parseJSON(raw);
     if (report) renderReport(report);
     else $("reportContent").innerHTML = `<p style="white-space:pre-wrap;font-size:14px">${escapeHtml(raw)}</p>`;
   } catch (e) {
+    clearInterval(stepTimer);
     const msg = e.message === "RATE_LIMITED"
       ? "Limite diário atingido. Tente novamente amanhã ou use sua própria chave (⚙︎)."
       : "Erro ao gerar relatório. Tente novamente.";
