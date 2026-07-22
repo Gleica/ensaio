@@ -12,7 +12,7 @@
 |---|---|---|---|---|---|---|---|
 | P1 | Telemetria básica de uso | 4 | 5 | 1 | **20** | — | ✅ feito |
 | P2 | Decisão de ICP (B2B vs B2C) | 5 | 3 | 2 | **7.5** | P1 (dados ajudam a decidir) | — |
-| P3 | Guardrail em camada separada | 3 | 4 | 2 | **6** | — | — |
+| P3 | Guardrail em camada separada | 3 | 4 | 2 | **6** | — | ✅ feito (via prompt) |
 | P4 | Reposicionar cenas/copy para RH (se B2B) | 4 | 3 | 1 | **12** | P2 | — |
 | P5 | Autenticação + persistência (LGPD-aware) | 5 | 4 | 4 | **5** | P2 | — |
 | P6 | Billing por usuário (fim do proxy compartilhado por IP) | 5 | 4 | 4 | **5** | P5 | — |
@@ -71,7 +71,9 @@ produza um PRODUCT-BRIEF.md com a decisão e o porquê.
 
 ---
 
-## P3 — Guardrail de segurança em camada separada
+## P3 — Guardrail de segurança em camada separada ✅ implementado (endurecimento via prompt)
+
+> Implementado como opção (b) do prompt sugerido — não como opção (a). Uma restrição adicional foi imposta no momento da implementação ("zero latência perceptível, zero custo adicional de IA"), o que descarta por definição qualquer segunda chamada de classificação. O `SAFETY_GUARD` foi endurecido contra jailbreak de roleplay (prioridade não-redefinível, reavaliação a cada turno, esclarecimento sobre a dificuldade PESADELO, reforço "sandwich" antes do formato de resposta). Um filtro determinístico de palavras-chave no client foi avaliado e descartado (alto risco de falso positivo em idiomatismos do PT-BR, manutenção de lista de termos sensíveis é ela própria um problema). Ver `docs/RFC-003-guardrails-conteudo.md` §"Atualização" para o raciocínio completo — inclusive a nota de que uma chamada de classificação independente continua sendo o upgrade natural se a restrição de custo/latência mudar no futuro.
 
 **Job to be done:** Quando um usuário tentar contornar o guardrail atual (que é só instrução de sistema dentro do próprio prompt de personagem), eu quero uma camada de moderação independente do modelo que interpreta o personagem, para que eu possa reduzir o risco de um print de output ofensivo virar problema de reputação antes de eu ter qualquer usuário pagante.
 

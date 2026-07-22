@@ -84,7 +84,7 @@ Aplica-se a: falas da persona, pensamentos ocultos, análises do coach, campos d
 
 Ver [RFC-003-guardrails-conteudo.md](RFC-003-guardrails-conteudo.md) para a especificação completa.
 
-**Resumo:** `SAFETY_GUARD` no início dos prompts `personaSystem` e `suggestSystem` instrui o modelo a recusar qualquer cenário com discurso de ódio, discriminação, violência, atividades ilegais, desinformação, violação de privacidade ou uso malicioso de tecnologia.
+**Resumo:** `SAFETY_GUARD` no início dos prompts `personaSystem` e `suggestSystem` instrui o modelo a recusar qualquer cenário com discurso de ódio, discriminação, violência, atividades ilegais, desinformação, violação de privacidade ou uso malicioso de tecnologia. Endurecido em julho/2026 contra jailbreak de roleplay (usuário tentando redefinir/suspender a regra em meio à conversa, ou usar a dificuldade PESADELO como justificativa) — continua sendo mitigação 100% via prompt, sem verificação independente da saída (ver RFC-003).
 
 ---
 
