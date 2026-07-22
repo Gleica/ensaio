@@ -27,6 +27,13 @@ jobs:
       - name: Inject proxy URL
         run: sed -i "s|__PROXY_URL__|${{ secrets.PROXY_URL }}|g" js/config.js
 
+      - name: Verify proxy URL was injected
+        run: |
+          if grep -q '__PROXY_URL__' js/config.js; then
+            echo "::error::PROXY_URL placeholder is still present in js/config.js after injection — the PROXY_URL secret may be empty, unset, or the sed substitution failed. Shared mode would be silently broken for every visitor."
+            exit 1
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

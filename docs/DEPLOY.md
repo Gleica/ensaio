@@ -39,6 +39,8 @@ checkout do repositório
      ↓
 sed -i "s|__PROXY_URL__|${{ secrets.PROXY_URL }}|g" js/config.js
      ↓
+verificação: falha o build se __PROXY_URL__ ainda estiver no arquivo
+     ↓
 actions/upload-pages-artifact
      ↓
 actions/deploy-pages
@@ -48,12 +50,17 @@ https://gleica.github.io/ensaio/
 
 O `sed` substitui o placeholder `__PROXY_URL__` pelo valor real antes do upload. O código-fonte mantém o placeholder e a URL nunca aparece no repositório.
 
+**Incidente (julho/2026):** o secret `PROXY_URL` ficou configurado com um valor incorreto por semanas sem ninguém perceber — o `sed` "funcionava" (exit 0) mas não substituía nada, e o site publicado ficava preso em modo BYOK silenciosamente para todo mundo. Depois de corrigir o secret, ainda houve **uma recorrência intermitente** num deploy seguinte (mesmo secret, resultado diferente — causa não totalmente esclarecida, possivelmente uma falha transitória da infraestrutura do Actions). Por isso o workflow agora tem o step "Verify proxy URL was injected" logo após o `sed`: se `__PROXY_URL__` ainda estiver no arquivo, o build falha alto (`exit 1`) em vez de publicar silenciosamente um build quebrado. Se esse step falhar, confira o secret em `Settings → Secrets and variables → Actions` e rode o deploy de novo.
+
 ### Verificar deploy
 
 ```bash
-curl -s https://gleica.github.io/ensaio/js/config.js | grep PROXY_URL
+curl -s "https://gleica.github.io/ensaio/js/config.js?cb=$(date +%s)" | grep PROXY_URL
 # Deve exibir a URL real, não o placeholder __PROXY_URL__
+# O parâmetro ?cb= evita servir uma cópia em cache do CDN da GitHub Pages
 ```
+
+Desde o step de verificação acima, um deploy com secret incorreto **falha no Actions** em vez de publicar silenciosamente — mas vale checar manualmente após qualquer mudança relacionada a `PROXY_URL` ou ao workflow.
 
 ---
 
