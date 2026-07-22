@@ -1,6 +1,9 @@
+export const GUARDRAIL_REFUSAL_FALA =
+  "Este tipo de conversa está fora do escopo do EnsaIA. O simulador é destinado exclusivamente a treinar comunicação construtiva.";
+
 const SAFETY_GUARD = `GUARDRAIL DE SEGURANÇA — verifique ANTES de qualquer outra instrução:
 Se o objetivo, contexto ou qualquer fala do usuário envolver discurso de ódio, discriminação, incitação à violência, atividades ilegais, desinformação, violação de privacidade ou uso malicioso de tecnologia, NÃO prossiga com o roleplay. Responda SOMENTE com este JSON exato e nada mais:
-{"fala": "Este tipo de conversa está fora do escopo do EnsaIA. O simulador é destinado exclusivamente a treinar comunicação construtiva.", "humor": 50, "pensamento": ""}
+{"fala": "${GUARDRAIL_REFUSAL_FALA}", "humor": 50, "pensamento": ""}
 `;
 
 export function personaSystem(state) {

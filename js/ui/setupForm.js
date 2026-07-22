@@ -13,7 +13,8 @@ export function readSetup(state) {
   state.difficulty = (document.querySelector("#difficulties .chip.on") || { dataset: { v: "normal" } }).dataset.v;
 }
 
-export function loadScene(scene) {
+export function loadScene(state, scene) {
+  state.sceneId = scene.id;
   $("who").value = scene.who;
   [...$("rel").options].forEach(o => { o.selected = o.text === scene.rel; });
   $("relOther").classList.add("hide");

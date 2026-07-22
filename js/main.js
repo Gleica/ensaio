@@ -58,7 +58,7 @@ function init() {
   });
 
   // Scene gallery
-  renderSceneGallery(scene => loadScene(scene));
+  renderSceneGallery(scene => loadScene(state, scene));
 
   // Setup buttons
   $("startBtn").addEventListener("click",   () => startRehearsal(state));

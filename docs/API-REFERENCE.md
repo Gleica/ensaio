@@ -123,8 +123,8 @@ anthropic-dangerous-direct-browser-access: true
 
 ## 3. Cloudflare Worker Proxy
 
-**URL:** `https://ensaio-proxy.gleica-tech.workers.dev/v1/messages`  
-**Método:** `POST /v1/messages` (único aceito)
+**URL base:** `https://ensaio-proxy.gleica-tech.workers.dev`  
+**Rotas aceitas:** `POST /v1/messages` (proxy Anthropic) e `POST /v1/track` (telemetria de uso, seção 3.1)
 
 ### Headers aceitos
 
@@ -154,6 +154,45 @@ anthropic-dangerous-direct-browser-access: true
   }
 }
 ```
+
+---
+
+### 3.1 Rota de telemetria — `POST /v1/track`
+
+Telemetria de uso agregada e privacy-first (sem PII, sem texto de conversa, sem identificador de sessão/usuário). Cada chamada incrementa um contador em `RATE_LIMIT_KV` — não guarda eventos individuais, só somas por dia. Só é chamada pelo frontend quando `isSharedMode()` é `true` (produção); em dev local não existe endpoint disponível e `track()` é um no-op.
+
+**Função no frontend:** `track(event, meta)` em `js/lib/analytics.js`
+
+**Request body:**
+```json
+{ "event": "msg_reached", "meta": "3" }
+```
+
+`meta` é opcional — ausente para eventos binários (`coach_clicked`, `report_generated`, `guardrail_triggered`).
+
+**Eventos aceitos e validação do `meta`:**
+
+| Evento | `meta` | Validação server-side |
+|---|---|---|
+| `session_start` | `"demo"` \| `"byok"` \| `"shared"` | enum fixo |
+| `scene_selected` | id da cena (`js/data/scenes.js`) ou `"custom"` | `/^[a-z0-9_-]{1,24}$/` |
+| `difficulty_selected` | `"facil"` \| `"normal"` \| `"pesadelo"` | enum fixo |
+| `msg_reached` | nº da mensagem na sessão, como string | `/^([1-9]|[1-4][0-9])$/` (1–49) |
+| `coach_clicked` | — | deve estar ausente |
+| `report_generated` | — | deve estar ausente |
+| `guardrail_triggered` | — | deve estar ausente |
+
+Eventos ou metadados fora dessa lista retornam `400` — não é possível gravar chaves arbitrárias no KV.
+
+**Armazenamento:** chave `an:{YYYY-MM-DD}:{event}` ou `an:{YYYY-MM-DD}:{event}:{meta}` → contador string, sem expiração (ao contrário das chaves `rl:*` de rate limiting, que expiram em 24h). `get`+`put` não é atômico — sob concorrência alta um punhado de eventos pode se perder; aceitável para métricas aproximadas de produto, não para billing.
+
+**Códigos de resposta:**
+
+| Status | Situação |
+|---|---|
+| 204 | Evento registrado |
+| 400 | `event` ou `meta` fora da lista/validador aceito |
+| 403 | Origin não está na whitelist |
 
 ---
 

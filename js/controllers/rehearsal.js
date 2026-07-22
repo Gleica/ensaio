@@ -1,8 +1,9 @@
 import { getKey, getModel, isSharedMode } from "../session.js";
 import { MAX_TOKENS } from "../config.js";
 import { callClaude, callClaudeStream } from "../api/anthropic.js";
-import { personaSystem, suggestSystem } from "../prompts.js";
+import { personaSystem, suggestSystem, GUARDRAIL_REFUSAL_FALA } from "../prompts.js";
 import { parseJSON, extractPartialFala } from "../lib/parse.js";
+import { track } from "../lib/analytics.js";
 import { resetSession } from "../state.js";
 import { guardSessionStart, consumeSession } from "../rateLimit.js";
 import { readSetup } from "../ui/setupForm.js";
@@ -20,6 +21,12 @@ function inferPronoun(who) {
   return /^(a |minha )/i.test(who.trim()) ? "ela" : "ele";
 }
 
+function trackSessionStart(state) {
+  track("session_start", getKey() ? "byok" : "shared");
+  track("scene_selected", state.sceneId || "custom");
+  track("difficulty_selected", state.difficulty);
+}
+
 export async function startRehearsal(state) {
   readSetup(state);
   if (!getKey() && !isSharedMode()) {
@@ -31,6 +38,7 @@ export async function startRehearsal(state) {
   if (!guard.ok) { alert(guard.message); return; }
   if (guard.usage) consumeSession(guard.usage);
 
+  trackSessionStart(state);
   resetSession(state);
   showSim(state);
   setMood(state, 50);
@@ -49,6 +57,7 @@ export async function suggestOpening(state) {
   if (!guard.ok) { alert(guard.message); return; }
   if (guard.usage) consumeSession(guard.usage);
 
+  trackSessionStart(state);
   resetSession(state);
   showSim(state);
   setMood(state, 50);
@@ -63,6 +72,7 @@ export async function suggestOpening(state) {
       [{ role: "user", content: "Escreva a primeira fala." }],
       MAX_TOKENS.suggest
     );
+    if (suggestion.includes(GUARDRAIL_REFUSAL_FALA)) track("guardrail_triggered");
     $("input").value = suggestion.trim();
     $("input").placeholder = "Escreva o que você diria...";
     addBubble("Sua primeira fala está pronta no campo abaixo. Edite se quiser e clique em Enviar para começar.", "them");
@@ -78,6 +88,7 @@ export async function suggestOpening(state) {
 export async function sendMessage(state, text) {
   state.history.push({ role: "user", content: text });
   state.msgCount++;
+  track("msg_reached", String(state.msgCount));
   updateMsgCounter(state);
   $("sendBtn").disabled = true;
 
@@ -98,6 +109,7 @@ export async function sendMessage(state, text) {
     );
     bubble.classList.remove("streaming");
     const parsed = parseJSON(raw) || { fala: raw, humor: state.mood, pensamento: "" };
+    if (parsed.fala === GUARDRAIL_REFUSAL_FALA) track("guardrail_triggered");
     bubble.textContent = parsed.fala || "...";
     if (parsed.pensamento) addThought(parsed.pensamento);
     if (typeof parsed.humor === "number") {

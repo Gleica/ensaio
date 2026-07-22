@@ -5,10 +5,12 @@ import { addBubble, addThought, scrollChat } from "../ui/chat.js";
 import { setMood } from "../ui/moodMeter.js";
 import { renderMoodChart } from "../ui/moodChart.js";
 import { renderCoach } from "../ui/coach.js";
+import { track } from "../lib/analytics.js";
 
 const $ = id => document.getElementById(id);
 
 export function runDemo(state) {
+  track("session_start", "demo");
   state.who         = DEMO.who;
   state.rel         = DEMO.rel;
   state.traits      = ["defensiva"];

@@ -7,11 +7,13 @@ import { buildTranscript } from "../lib/transcript.js";
 import { escapeHtml } from "../lib/escape.js";
 import { renderCoach } from "../ui/coach.js";
 import { renderReport } from "../ui/report.js";
+import { track } from "../lib/analytics.js";
 
 const $ = id => document.getElementById(id);
 
 export async function requestCoach(state) {
   if (!state.history.length) { alert("Mande pelo menos uma fala antes de pedir feedback."); return; }
+  track("coach_clicked");
   $("coachBtn").disabled = true;
   $("coachBtn").textContent = "Analisando...";
   const transcript = buildTranscript(state.history);
@@ -67,7 +69,7 @@ export async function generateReport(state) {
     );
     clearInterval(stepTimer);
     const report = parseJSON(raw);
-    if (report) renderReport(report);
+    if (report) { renderReport(report); track("report_generated"); }
     else $("reportContent").innerHTML = `<p style="white-space:pre-wrap;font-size:14px">${escapeHtml(raw)}</p>`;
   } catch (e) {
     clearInterval(stepTimer);

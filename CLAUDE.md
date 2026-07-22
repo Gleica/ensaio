@@ -55,6 +55,7 @@ js/
     transcript.js                 ← buildTranscript(history)
     mood.js                       ← moodScale(value) → {emoji, label, color}
     escape.js                     ← escapeHtml(s)
+    analytics.js                  ← track(event, meta): fire-and-forget usage telemetry, no-ops locally
   data/
     scenes.js                     ← SCENES array (6 pre-built scenarios)
     demo.js                       ← DEMO object (scripted conversation)
@@ -64,7 +65,7 @@ js/
     moodChart.js                  ← buildMoodChartSvg(history), renderMoodChart(history)
     coach.js                      ← renderCoach(coachData)
     report.js                     ← renderReport(report)
-    setupForm.js                  ← readSetup(state), loadScene(scene), renderSceneGallery(onSceneClick)
+    setupForm.js                  ← readSetup(state), loadScene(state, scene), renderSceneGallery(onSceneClick)
     screens.js                    ← showSim(state), showSetup()
     msgCounter.js                 ← updateMsgCounter(state)
   controllers/
@@ -91,6 +92,7 @@ worker/
 - **Demo mode:** `DEMO` object in `data/demo.js` holds a fully scripted 4-turn conversation (pedir aumento scenario). When `state.demo = true`, all API calls are gated to `demoReply()` / `demoCoach()` in `controllers/demo.js`. Uses `state.demoStep` to track position in `DEMO.turns` and adds a simulated typing delay (`DEMO_TYPING_MS`). Demo is always available without a key via "▶ Ver demonstração" and does not count toward rate limits.
 - **Content safety guardrails:** A constant `SAFETY_GUARD` in `js/prompts.js` is prepended to `personaSystem` and `suggestSystem` before any roleplay instruction. It instructs the model to refuse and return a fixed refusal JSON (`{fala, humor: 50, pensamento: ""}`) if the scenario involves hate speech, discrimination, violence, illegal activity, disinformation, privacy violations, or malicious use of technology. `coachSystem` and `reportSystem` are not guarded because they only receive transcripts of conversations already filtered by the persona prompt.
 - **Rate limiting (shared mode only):** Two layers. Client-side: `guardSessionStart()` in `rateLimit.js` tracks daily session count in `localStorage` (key: `ensaio_usage`, value: `{date, sessions}`) and blocks before hitting the API. Server-side: the Cloudflare Worker enforces a hard limit of 30 requests/IP/day via KV. Client limits: `msgsPerSession: 8`, `sessionsPerDay: 3` (defined in `LIMITS` in `config.js`).
+- **Usage telemetry (shared mode only):** `track(event, meta)` in `lib/analytics.js` fires a fire-and-forget `POST` to the Worker's `/v1/track` route — only when `isSharedMode()` is true, so local dev never sends anything. Tracks `session_start` (mode: demo/byok/shared), `scene_selected` (or `custom`), `difficulty_selected`, `msg_reached` (funnel of how far a session gets before abandoning), `coach_clicked`, `report_generated`, and `guardrail_triggered` — event names and `meta` values are both validated against a fixed allowlist server-side (`TRACK_META_VALIDATORS` in `worker/index.js`). No conversation text, no PII, no session/user identifier — see `docs/API-REFERENCE.md` §3.1.
 
 ### Cloudflare Worker proxy
 
@@ -101,6 +103,7 @@ worker/
 - **Rate limiting:** Per-IP daily limit (30 requests/day) stored in Cloudflare KV (`RATE_LIMIT_KV` binding). Key format: `rl:{ip}:{YYYY-MM-DD}`, TTL 86400s. Returns `429` when limit is hit.
 - **Request proxying:** Forwards `POST /v1/messages` to `https://api.anthropic.com/v1/messages`, adding `x-api-key: env.ANTHROPIC_KEY` server-side.
 - **Response streaming:** Passes Anthropic's SSE response back to the browser with CORS headers intact.
+- **Usage telemetry:** `POST /v1/track` increments an aggregate counter in `RATE_LIMIT_KV` per `{date, event, meta}` — no per-user/session data stored, no TTL (kept for historical reporting, unlike the 24h rate-limit keys). See `docs/API-REFERENCE.md` §3.1 for the event/meta allowlist.
 
 **Deployment:**
 - Config: `worker/wrangler.toml` (KV namespace ID `9ae05cba8f26459b9563f3389646d0b0`)
@@ -128,7 +131,8 @@ let state = {
   history: [],      // full messages array sent to the API [{role, content}]
   msgCount: 0,      // user messages sent this session (for rate limiting)
   demo: false,      // demo mode flag
-  demoStep: 0       // index into DEMO.turns
+  demoStep: 0,      // index into DEMO.turns
+  sceneId: null      // id of the SCENES entry loaded via loadScene(), or null for a custom setup
 };
 ```
 

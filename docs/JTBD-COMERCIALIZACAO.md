@@ -8,21 +8,23 @@
 
 ## Resumo rápido
 
-| # | Job | Impacto | Confiança | Esforço | ICE | Depende de |
-|---|---|---|---|---|---|---|
-| P1 | Telemetria básica de uso | 4 | 5 | 1 | **20** | — |
-| P2 | Decisão de ICP (B2B vs B2C) | 5 | 3 | 2 | **7.5** | P1 (dados ajudam a decidir) |
-| P3 | Guardrail em camada separada | 3 | 4 | 2 | **6** | — |
-| P4 | Reposicionar cenas/copy para RH (se B2B) | 4 | 3 | 1 | **12** | P2 |
-| P5 | Autenticação + persistência (LGPD-aware) | 5 | 4 | 4 | **5** | P2 |
-| P6 | Billing por usuário (fim do proxy compartilhado por IP) | 5 | 4 | 4 | **5** | P5 |
-| P7 | Dashboard de progresso (a alavanca de 10x) | 5 | 3 | 3 | **5** | P5 |
+| # | Job | Impacto | Confiança | Esforço | ICE | Depende de | Status |
+|---|---|---|---|---|---|---|---|
+| P1 | Telemetria básica de uso | 4 | 5 | 1 | **20** | — | ✅ feito |
+| P2 | Decisão de ICP (B2B vs B2C) | 5 | 3 | 2 | **7.5** | P1 (dados ajudam a decidir) | — |
+| P3 | Guardrail em camada separada | 3 | 4 | 2 | **6** | — | — |
+| P4 | Reposicionar cenas/copy para RH (se B2B) | 4 | 3 | 1 | **12** | P2 | — |
+| P5 | Autenticação + persistência (LGPD-aware) | 5 | 4 | 4 | **5** | P2 | — |
+| P6 | Billing por usuário (fim do proxy compartilhado por IP) | 5 | 4 | 4 | **5** | P5 | — |
+| P7 | Dashboard de progresso (a alavanca de 10x) | 5 | 3 | 3 | **5** | P5 | — |
 
 ICE alto não significa "fazer primeiro" sempre — P4 tem ICE maior que P5/P6/P7, mas não faz sentido reposicionar copy antes de decidir o público (P2). A ordem de execução recomendada é a ordem numérica (P1→P7); o ICE serve para você repriorizar dentro desse esqueleto se quiser paralelizar com outra pessoa no time.
 
 ---
 
-## P1 — Telemetria básica de uso
+## P1 — Telemetria básica de uso ✅ implementado
+
+> Implementado via evento simples batendo no próprio Worker (rota `POST /v1/track`), gravando contadores agregados em `RATE_LIMIT_KV` — a opção que menos contradiz o "sem backend próprio, sem PII" do job abaixo (Cloudflare Web Analytics não cobre eventos customizados; Plausible self-hosted exigiria infra própria). Ver `docs/API-REFERENCE.md` §3.1 e `CLAUDE.md` para o contrato completo.
 
 **Job to be done:** Quando eu precisar decidir qualquer coisa sobre o produto — se vale pivotar para B2B, se o funil de setup→conversa→relatório está vazando gente, se alguém além dos jurados do hackathon já usou isso — eu quero dados reais de uso, para que eu possa parar de decidir no escuro.
 
