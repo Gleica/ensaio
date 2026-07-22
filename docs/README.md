@@ -19,6 +19,7 @@ Documentação técnica e de produto do simulador de conversas difíceis EnsaIA.
 | [RFC-002-proxy-cloudflare-worker.md](RFC-002-proxy-cloudflare-worker.md) | RFC | Decisão pelo Cloudflare Worker como proxy para modo compartilhado |
 | [RFC-003-guardrails-conteudo.md](RFC-003-guardrails-conteudo.md) | RFC | Decisão pela abordagem de guardrail via system prompt |
 | [RFC-004-rate-limiting-duplo.md](RFC-004-rate-limiting-duplo.md) | RFC | Decisão pelo rate limiting em duas camadas (client + server) |
+| [JTBD-COMERCIALIZACAO.md](JTBD-COMERCIALIZACAO.md) | Estratégia | Jobs to be done priorizados (ICE) para tornar o EnsaIA comercializável |
 
 ---
 
