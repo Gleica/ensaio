@@ -4,7 +4,6 @@ import { callClaude, callClaudeStream } from "../api/anthropic.js";
 import { coachSystem, reportSystem } from "../prompts.js";
 import { parseJSON } from "../lib/parse.js";
 import { buildTranscript } from "../lib/transcript.js";
-import { escapeHtml } from "../lib/escape.js";
 import { renderCoach } from "../ui/coach.js";
 import { renderReport } from "../ui/report.js";
 import { track } from "../lib/analytics.js";
@@ -70,8 +69,14 @@ export async function generateReport(state) {
     );
     clearInterval(stepTimer);
     const report = parseJSON(raw);
-    if (report) { state.lastReport = report; renderReport(report); track("report_generated"); }
-    else $("reportContent").innerHTML = `<p style="white-space:pre-wrap;font-size:14px">${escapeHtml(raw)}</p>`;
+    if (report) {
+      state.lastReport = report;
+      renderReport(report);
+      track("report_generated");
+    } else {
+      $("reportContent").innerHTML = `<p style="color:var(--bad)">Não foi possível gerar o relatório completo. Tente novamente.</p>`;
+      console.error("Report JSON parse failed — raw response:", raw);
+    }
   } catch (e) {
     clearInterval(stepTimer);
     const msg = e.message === "RATE_LIMITED"

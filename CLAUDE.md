@@ -164,7 +164,7 @@ let state = {
 
 - **Persona:** `callClaudeStream`, `max_tokens: 600`, must return `{fala, humor, pensamento}`
 - **Coach:** `callClaude`, `max_tokens: 500`, must return `{analise, sugestao}`
-- **Report:** `callClaudeStream`, `max_tokens: 750`, must return `{nota, titulo, pontos_fortes[], erros_recorrentes[], melhor_fala, proximo_passo, arco}` — JSON parsed after stream ends
+- **Report:** `callClaudeStream`, `max_tokens: 1200`, must return `{nota, titulo, pontos_fortes[], erros_recorrentes[], melhor_fala, proximo_passo, arco}` — JSON parsed after stream ends. If the model's response gets truncated by the token cap before the JSON closes, `parseJSON` returns `null` and `generateReport` shows a friendly retry message instead of dumping the raw text.
 - **Suggestion:** `callClaude`, `max_tokens: 250`, returns plain text
 - Full `state.history` is sent on every persona call (growing context per session)
 - Anthropic API version pinned to `2023-06-01` in `api/anthropic.js`; default model: `claude-sonnet-5`

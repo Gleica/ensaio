@@ -20,7 +20,7 @@ export const LIMITS = {
 export const MAX_TOKENS = {
   persona: 600,
   coach:   500,
-  report:  750,
+  report:  1200,
   suggest: 250,
 };
 

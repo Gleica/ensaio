@@ -83,7 +83,7 @@ Funções públicas:
 |---|---|---|
 | `personaSystem(state)` | `{fala, humor, pensamento}` | 600 |
 | `coachSystem(state)` | `{analise, sugestao}` | 500 |
-| `reportSystem(state)` | Objeto de relatório completo | 750 |
+| `reportSystem(state)` | Objeto de relatório completo | 1200 |
 | `suggestSystem(state)` | Texto plain (abertura sugerida) | 250 |
 
 ### 5. UI Layer

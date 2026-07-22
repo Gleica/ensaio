@@ -79,7 +79,7 @@ anthropic-dangerous-direct-browser-access: true
 
 ### 2.3 Relatório (streaming, JSON parseado ao final)
 
-**Função:** `callClaudeStream(key, model, reportSystem(state), transcript, 750, onChunk)`
+**Função:** `callClaudeStream(key, model, reportSystem(state), transcript, 1200, onChunk)`
 
 **Response:**
 ```json

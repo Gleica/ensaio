@@ -103,7 +103,7 @@ O `state.history` completo é enviado. O coach analisa a **última fala do usuá
 
 **Papel:** avaliar o desempenho completo da sessão.  
 **Modelo:** `callClaudeStream` (streaming; JSON parseado ao final)  
-**Max tokens:** 750  
+**Max tokens:** 1200 (aumentado de 750 — o valor original truncava relatórios mais longos antes do JSON fechar, quebrando o parse; ver [ARQUITETURA.md](ARQUITETURA.md))  
 **Formato:** JSON obrigatório
 
 ### Estrutura do system prompt
