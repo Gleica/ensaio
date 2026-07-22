@@ -160,7 +160,7 @@ let state = {
 - **Report:** `callClaudeStream`, `max_tokens: 750`, must return `{nota, titulo, pontos_fortes[], erros_recorrentes[], melhor_fala, proximo_passo, arco}` — JSON parsed after stream ends
 - **Suggestion:** `callClaude`, `max_tokens: 250`, returns plain text
 - Full `state.history` is sent on every persona call (growing context per session)
-- Anthropic API version pinned to `2023-06-01` in `api/anthropic.js`; default model: `claude-sonnet-4-6`
+- Anthropic API version pinned to `2023-06-01` in `api/anthropic.js`; default model: `claude-sonnet-5`
 
 ## Deploy
 

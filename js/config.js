@@ -1,5 +1,5 @@
 export const API_URL = "https://api.anthropic.com/v1/messages";
-export const MODEL_DEFAULT = "claude-sonnet-4-6";
+export const MODEL_DEFAULT = "claude-sonnet-5";
 
 // Substituído em produção pelo GitHub Actions via secret PROXY_URL.
 // Localmente permanece como placeholder → modo BYOK ativo.
