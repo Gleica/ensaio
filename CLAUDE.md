@@ -17,6 +17,25 @@ Opening `index.html` directly in a browser also works, though a local server avo
 
 **Local vs. production modes:** Locally, `PROXY_URL` remains the `"__PROXY_URL__"` placeholder, so `isSharedMode()` returns `false`. The gear button (⚙︎) is visible and an API key is required to start any session (demo mode is always available without a key). The proxy mode only activates after a GitHub Actions deploy that injects the real `PROXY_URL`.
 
+## Testing
+
+Playwright is the only test tool (E2E + functional integration, no separate unit test runner). `npm test` is a stub and does nothing useful — run Playwright directly.
+
+```bash
+npm install && npx playwright install chromium   # once
+python3 -m http.server 9000 &                    # required: baseURL is http://localhost:9000
+npx playwright test tests/ensaio.spec.js          # main suite: demo mode + real AI, mocked-free
+npx playwright test tests/production-suite.spec.js  # hits the live deployed site + real Anthropic API
+npx playwright test tests/proxy-live.spec.js      # hits the live Cloudflare Worker directly
+npx playwright test tests/ensaio.spec.js -g "some test name"  # run a single test
+```
+
+`tests/ensaio.spec.js` is the one to run for local iteration; the other two suites hit live production infra (GitHub Pages + the Cloudflare Worker) and are meant for post-deploy verification, not local dev. See `docs/TESTES.md` for full scenario coverage and conventions.
+
+## Documentation
+
+`docs/` has deeper reference material worth checking before making non-trivial changes: `PRD.md` (product), `ARQUITETURA.md` (layered architecture diagram/session flow), `API-REFERENCE.md` (Anthropic + Worker contracts, SSE format, JSON schemas), `PROMPTS.md` (prompt engineering rationale for the four AI roles), `SEGURANCA.md` (threat model), `DEPLOY.md` (deploy/rollback/monitoring), `TESTES.md` (test strategy), and `RFC-00{1..4}-*.md` (architecture decisions: zero-build, Cloudflare proxy, content guardrails, dual rate limiting).
+
 ## File structure
 
 ```
