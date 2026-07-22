@@ -49,6 +49,7 @@ export async function generateReport(state) {
   if (userTurns < 2) { alert("Troque pelo menos 2 falas antes de gerar o relatório."); return; }
 
   $("reportContent").innerHTML = `<div class="report-loading"><span id="reportStep">${REPORT_STEPS[0]}</span></div>`;
+  $("reportActions").classList.add("hide");
   $("reportModal").classList.add("on");
 
   let stepIdx = 0;
@@ -69,7 +70,7 @@ export async function generateReport(state) {
     );
     clearInterval(stepTimer);
     const report = parseJSON(raw);
-    if (report) { renderReport(report); track("report_generated"); }
+    if (report) { state.lastReport = report; renderReport(report); track("report_generated"); }
     else $("reportContent").innerHTML = `<p style="white-space:pre-wrap;font-size:14px">${escapeHtml(raw)}</p>`;
   } catch (e) {
     clearInterval(stepTimer);

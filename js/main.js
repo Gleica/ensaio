@@ -7,6 +7,7 @@ import { showSetup } from "./ui/screens.js";
 import { addBubble } from "./ui/chat.js";
 import { startRehearsal, suggestOpening, sendMessage } from "./controllers/rehearsal.js";
 import { requestCoach, generateReport } from "./controllers/feedback.js";
+import { downloadReportMarkdown } from "./ui/report.js";
 import { runDemo, demoReply, demoCoach } from "./controllers/demo.js";
 
 const $ = id => document.getElementById(id);
@@ -88,6 +89,8 @@ function init() {
     generateReport(state);
   });
   $("reportClose").addEventListener("click", () => $("reportModal").classList.remove("on"));
+  $("reportMdBtn").addEventListener("click", () => downloadReportMarkdown(state.lastReport, state));
+  $("reportPdfBtn").addEventListener("click", () => window.print());
 
   // Reset
   $("resetBtn").addEventListener("click", () => {

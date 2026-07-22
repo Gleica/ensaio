@@ -1,6 +1,19 @@
 import { escapeHtml } from "../lib/escape.js";
+import { buildReportMarkdown } from "../lib/reportExport.js";
 
 const $ = id => document.getElementById(id);
+
+export function downloadReportMarkdown(report, state) {
+  if (!report) return;
+  const markdown = buildReportMarkdown(report, state);
+  const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ensaio-relatorio-${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export function renderReport(report) {
   const nota = Math.max(0, Math.min(10, Number.parseFloat(report.nota) || 0));
@@ -28,4 +41,5 @@ export function renderReport(report) {
     ${report.proximo_passo ? `<div class="report-section"><h4>🎯 Próximo passo</h4><div class="report-next">${escapeHtml(report.proximo_passo)}</div></div>` : ""}
     ${report.arco ? `<div class="report-section"><h4>📈 Arco emocional</h4><p class="report-arc">${escapeHtml(report.arco)}</p></div>` : ""}
   `;
+  $("reportActions").classList.remove("hide");
 }
